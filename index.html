@@ -247,8 +247,28 @@ window.doLogin=async function(){
   const pw=($('l-pw').value||'').trim();
   if(!em||!pw){setMsg('l-msg','Please enter email and password.','merr');return;}
   const btn=$('l-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Signing in...';
-  try{await signInWithEmailAndPassword(auth,em,pw);}
-  catch(e){
+  try{
+    // Try Firebase Auth first
+    await signInWithEmailAndPassword(auth,em,pw);
+  } catch(e){
+    // If auth fails, check if caregiver exists in Firestore with tempPass
+    if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'){
+      try{
+        const cgs=await fsWhere('caregivers','email','==',em);
+        if(cgs.length>0&&cgs[0].tempPass===pw){
+          // Create Firebase Auth account for caregiver now
+          await createUserWithEmailAndPassword(auth,em,pw);
+          return; // onAuthStateChanged will handle the rest
+        }
+      } catch(e2){
+        if(e2.code==='auth/email-already-in-use'){
+          // Account exists but wrong password
+          setMsg('l-msg','Incorrect password.','merr');
+          btn.disabled=false;btn.innerHTML='Sign in';
+          return;
+        }
+      }
+    }
     let m='Incorrect email or password.';
     if(e.code==='auth/too-many-requests')m='Too many attempts. Try again later.';
     setMsg('l-msg',m,'merr');
@@ -359,7 +379,7 @@ function buildSupCG(){
       <div class="fld"><label>Phone</label><input id="cg-ph" value="${ed?.phone||''}" placeholder="Phone number" autocomplete="off"></div>
     </div>
     <div class="fld"><label>Email (used to login)</label><input id="cg-em" type="email" value="${ed?.email||''}" placeholder="caregiver@email.com" autocomplete="off" ${ed?'readonly style="opacity:.6"':''}></div>
-    ${!ed?`<div class="fld"><label>Temporary password</label><input id="cg-pw" type="text" placeholder="Min 6 characters — share this with the caregiver" autocomplete="off"><div class="hint">The caregiver will use this email + password to log in.</div></div>`:''}
+    <div class="fld"><label>${ed?'Password (leave blank to keep current)':'Temporary password'}</label><input id="cg-pw" type="text" value="${ed?.tempPass||''}" placeholder="${ed?'Enter new password to change it':'Min 6 characters — share this with the caregiver'}" autocomplete="off"><div class="hint">The caregiver uses this email + password to log in. ${ed?'Update it here anytime.':''}</div></div>
     <div id="cg-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-g" onclick="window.saveCG()">${ed?'Save changes':'Add caregiver'}</button>
@@ -379,17 +399,18 @@ window.saveCG=async function(){
   const name=($('cg-n').value||'').trim();
   const phone=($('cg-ph').value||'').trim();
   const email=($('cg-em').value||'').trim();
+  const pw=($('cg-pw').value||'').trim();
   if(!name||!email){setMsg('cg-msg','Name and email are required.','merr');return;}
   showLoading('cg-msg','Saving caregiver...');
   try{
     if(EDIT_CG){
-      await fsSet('caregivers',EDIT_CG.id,{name,phone,updatedAt:Date.now()});
+      const updates={name,phone,updatedAt:Date.now()};
+      if(pw&&pw.length>=6) updates.tempPass=pw;
+      else if(pw&&pw.length>0&&pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
+      await fsSet('caregivers',EDIT_CG.id,updates);
       EDIT_CG=null;
     } else {
-      const pw=($('cg-pw').value||'').trim();
       if(!pw||pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
-      // Save to Firestore first with temp credentials
-      // Auth account will be created when caregiver first logs in
       const id=uid();
       await fsSet('caregivers',id,{name,email,phone,tempPass:pw,createdAt:Date.now()});
     }
