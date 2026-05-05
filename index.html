@@ -199,7 +199,7 @@ function render(){
   const app=$('app');
   if(VIEW==='loading'){app.innerHTML=`<div class="loading"><div class="spin" style="width:24px;height:24px;border-width:3px"></div><p style="color:var(--tx2);font-size:14px">Loading...</p></div>`;return;}
   if(VIEW==='login'){app.innerHTML=buildLogin();attachLoginEvents();return;}
-  if(VIEW==='supervisor'){app.innerHTML=buildSupervisor();return;}
+  if(VIEW==='supervisor'){app.innerHTML=await buildSupervisor();return;}
   if(VIEW==='caregiver'){app.innerHTML=buildCaregiver();if(CG_TAB==='clock')startTick();return;}
 }
 
@@ -242,35 +242,113 @@ function attachLoginEvents(){
   if(p) p.onkeydown=e=>{if(e.key==='Enter')window.doLogin();};
 }
 
+// ── LOCKOUT HELPERS ──
+// Stored in Firestore under lockouts/{email}
+async function getLockout(em){
+  try{ return await fsGet('lockouts', btoa(em).replace(/=/g,'')); }catch(e){return null;}
+}
+async function recordFailedAttempt(em, isSupervisor){
+  if(isSupervisor) return; // never lock out supervisor
+  const key = btoa(em).replace(/=/g,'');
+  const existing = await getLockout(em);
+  const attempts = (existing?.attempts||0) + 1;
+  const locked = attempts >= 2;
+  await fsSet('lockouts', key, {
+    email:em, attempts, locked,
+    lockedAt: locked ? Date.now() : (existing?.lockedAt||null),
+    updatedAt: Date.now()
+  });
+  return {attempts, locked};
+}
+async function clearLockout(em){
+  try{ await fsDel('lockouts', btoa(em).replace(/=/g,'')); }catch(e){}
+}
+
 window.doLogin=async function(){
-  const em=($('l-em').value||'').trim();
+  const em=($('l-em').value||'').trim().toLowerCase();
   const pw=($('l-pw').value||'').trim();
   if(!em||!pw){setMsg('l-msg','Please enter email and password.','merr');return;}
   const btn=$('l-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Signing in...';
-  try{
-    // Try Firebase Auth first
-    await signInWithEmailAndPassword(auth,em,pw);
-  } catch(e){
-    // If auth fails, check if caregiver exists in Firestore with tempPass
-    if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'){
+
+  // Check supervisor first
+  const supDoc = await fsGet('settings','supervisor');
+  const isSupervisor = supDoc && supDoc.email.toLowerCase()===em;
+
+  // Check lockout for non-supervisors
+  if(!isSupervisor){
+    const lockout = await getLockout(em);
+    if(lockout?.locked){
+      setMsg('l-msg','&#x1F512; This account has been locked after too many failed attempts. Contact your supervisor.','merr');
+      btn.disabled=false;btn.innerHTML='Sign in';
+      return;
+    }
+  }
+
+  // First check if this is a caregiver with tempPass (not yet in Firebase Auth)
+  if(!isSupervisor){
+    const cgs = await fsWhere('caregivers','email','==',em);
+    if(cgs.length>0){
+      const cg = cgs[0];
+      // Check if Firebase Auth account exists yet
       try{
-        const cgs=await fsWhere('caregivers','email','==',em);
-        if(cgs.length>0&&cgs[0].tempPass===pw){
-          // Create Firebase Auth account for caregiver now
-          await createUserWithEmailAndPassword(auth,em,pw);
-          return; // onAuthStateChanged will handle the rest
-        }
-      } catch(e2){
-        if(e2.code==='auth/email-already-in-use'){
-          // Account exists but wrong password
-          setMsg('l-msg','Incorrect password.','merr');
+        // Try signing in with Firebase Auth
+        await signInWithEmailAndPassword(auth,em,pw);
+        await clearLockout(em);
+        return;
+      } catch(authErr){
+        if(authErr.code==='auth/user-not-found'||authErr.code==='auth/invalid-credential'){
+          // No Firebase Auth account yet - check tempPass
+          if(cg.tempPass===pw){
+            // Create Firebase Auth account now
+            try{
+              await createUserWithEmailAndPassword(auth,em,pw);
+              await clearLockout(em);
+              return;
+            } catch(createErr){
+              if(createErr.code==='auth/email-already-in-use'){
+                // Account exists, try signing in again
+                try{
+                  await signInWithEmailAndPassword(auth,em,pw);
+                  await clearLockout(em);
+                  return;
+                } catch(e3){}
+              }
+            }
+          }
+          // Wrong password
+          const result = await recordFailedAttempt(em, false);
+          if(result?.locked){
+            setMsg('l-msg','&#x1F512; Account locked after 2 failed attempts. Contact your supervisor to unlock.','merr');
+          } else {
+            setMsg('l-msg',`Incorrect password. ${2-(result?.attempts||0)} attempt(s) remaining before lockout.`,'merr');
+          }
+          btn.disabled=false;btn.innerHTML='Sign in';
+          return;
+        } else if(authErr.code==='auth/wrong-password'||authErr.code==='auth/invalid-login-credentials'){
+          // Firebase Auth account exists but wrong password
+          const result = await recordFailedAttempt(em, false);
+          if(result?.locked){
+            setMsg('l-msg','&#x1F512; Account locked after 2 failed attempts. Contact your supervisor to unlock.','merr');
+          } else {
+            setMsg('l-msg',`Incorrect password. ${2-(result?.attempts||0)} attempt(s) remaining before lockout.`,'merr');
+          }
           btn.disabled=false;btn.innerHTML='Sign in';
           return;
         }
       }
+    } else {
+      setMsg('l-msg','No account found with that email.','merr');
+      btn.disabled=false;btn.innerHTML='Sign in';
+      return;
     }
+  }
+
+  // Supervisor login
+  try{
+    await signInWithEmailAndPassword(auth,em,pw);
+  } catch(e){
     let m='Incorrect email or password.';
-    if(e.code==='auth/too-many-requests')m='Too many attempts. Try again later.';
+    if(e.code==='auth/too-many-requests') m='Too many attempts. Please wait a moment and try again.';
     setMsg('l-msg',m,'merr');
     btn.disabled=false;btn.innerHTML='Sign in';
   }
@@ -295,13 +373,13 @@ window.doSetupSup=async function(){
 // ════════════════════════════════════════
 // SUPERVISOR
 // ════════════════════════════════════════
-function buildSupervisor(){
+async function buildSupervisor(){
   const tabs=['dashboard','caregivers','clients','assignments','reports'];
   const labels=['Dashboard','Caregivers','Clients','Assign','Reports'];
   let tabHtml=tabs.map((t,i)=>`<button class="nav-tab ${SUP_TAB===t?'on':''}" onclick="window.supTab('${t}')">${labels[i]}</button>`).join('');
   let body='';
   if(SUP_TAB==='dashboard') body=buildSupDash();
-  else if(SUP_TAB==='caregivers') body=buildSupCG();
+  else if(SUP_TAB==='caregivers') body=await buildSupCG();
   else if(SUP_TAB==='clients') body=buildSupCL();
   else if(SUP_TAB==='assignments') body=buildSupAS();
   else if(SUP_TAB==='reports') body=buildSupReports();
@@ -349,26 +427,73 @@ function buildSupDash(){
       <button class="btn btn-o" onclick="window.supTab('reports')">View reports</button>
     </div>
   </div>`;
+  </div>
+  <div class="card">
+    <div class="sec-label">Supervisor settings</div>
+    <div class="fld"><label>Change supervisor password</label><input id="sup-pw" type="password" placeholder="New password (min 6 chars)" autocomplete="off"></div>
+    <div id="sup-pw-msg" class="smsg mneu" style="min-height:14px"></div>
+    <button class="btn btn-o" style="margin-bottom:.75rem" onclick="window.changeSupPass()">Update password</button>
+    <div class="div"></div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:.75rem">If you are locked out, tap below to receive a password reset link at your supervisor email.</div>
+    <button class="btn btn-o" onclick="window.sendSupReset()">&#128274; Send password reset to my email</button>
+    <div id="sup-reset-msg" class="smsg mneu" style="min-height:14px;margin-top:.5rem"></div>
+  </div>\`;
 }
 
+window.changeSupPass=async function(){
+  const p=($('sup-pw').value||'').trim();
+  if(!p||p.length<6){setMsg('sup-pw-msg','Password must be at least 6 characters.','merr');return;}
+  try{
+    const{updatePassword}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    await updatePassword(auth.currentUser,p);
+    setMsg('sup-pw-msg','Password updated successfully!','mok');
+    $('sup-pw').value='';
+  }catch(e){setMsg('sup-pw-msg','Error: '+e.message+'. Try signing out and back in first.','merr');}
+};
+
+window.sendSupReset=async function(){
+  const msg=$('sup-reset-msg');
+  if(msg){msg.className='smsg mneu';msg.innerHTML='<span class="spin"></span>Sending reset email...';}
+  try{
+    const{sendPasswordResetEmail}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const supDoc=await fsGet('settings','supervisor');
+    if(!supDoc?.email){if(msg){msg.className='smsg merr';msg.textContent='No supervisor email on file.';}return;}
+    await sendPasswordResetEmail(auth,supDoc.email);
+    if(msg){msg.className='smsg mok';msg.textContent='Reset link sent to '+supDoc.email+'. Check your inbox!';}
+  }catch(e){if(msg){msg.className='smsg merr';msg.textContent='Error: '+e.message;}}
+};
+
+
 // Caregivers
-function buildSupCG(){
+async function buildSupCG(){
   const ed=EDIT_CG;
+  // Build lockout map for display
+  const lockoutMap={};
+  await Promise.all(DB.caregivers.map(async cg=>{
+    try{const l=await fsGet('lockouts',btoa(cg.email).replace(/=/g,''));if(l)lockoutMap[cg.id]=l;}catch(e){}
+  }));
   const listRows=DB.caregivers.length?DB.caregivers.map(cg=>{
     const as=getAS(cg.id);const cl=as?getCL(as.clientId):null;
     const tms=totMs(todaySess(cg.id));
+    const lk=lockoutMap[cg.id];
+    const lockBadge=lk?.locked?`<span style="font-size:11px;font-weight:600;background:var(--red-l);color:var(--red-t);padding:2px 8px;border-radius:20px;margin-left:4px">&#x1F512; LOCKED</span>`:'';
+    const unlockBtn=lk?.locked?`<button class="btn-icon" style="color:var(--green-t);font-size:11px" onclick="window.unlockCG('${cg.email}')">Unlock</button>`:'';
     return`<div class="row">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="av av-g">${ini(cg.name)}</div>
         <div>
-          <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg.name}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg.name}${lockBadge}</div>
           <div style="font-size:12px;color:var(--tx2)">${cg.email}</div>
           <div style="font-size:12px;color:var(--tx3)">${cl?'Client: '+cl.name:'No assignment'} &bull; Today: ${fHM(tms)}</div>
+          <div style="font-size:12px;color:var(--tx3)">Password: ${cg.tempPass||'(set)'}</div>
         </div>
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="btn-icon" onclick="window.editCG('${cg.id}')">&#9998;</button>
-        <button class="btn-icon" style="color:var(--red-t)" onclick="window.deleteCG('${cg.id}')">&#128465;</button>
+      <div style="display:flex;gap:6px;flex-shrink:0;flex-direction:column;align-items:flex-end">
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="window.editCG('${cg.id}')">&#9998;</button>
+          <button class="btn-icon" style="color:var(--red-t)" onclick="window.deleteCG('${cg.id}')">&#128465;</button>
+        </div>
+        ${unlockBtn}
       </div>
     </div>`;}).join(''):`<div class="empty">No caregivers added yet.<br>Use the form above to add one.</div>`;
   return`
@@ -395,22 +520,44 @@ function buildSupCG(){
 window.editCG=function(id){EDIT_CG=DB.caregivers.find(c=>c.id===id)||null;SUP_TAB='caregivers';render();};
 window.cancelEditCG=function(){EDIT_CG=null;render();};
 
+window.unlockCG=async function(email){
+  if(!confirm('Unlock '+email+'? They will be able to log in again.'))return;
+  await clearLockout(email);
+  SUP_TAB='caregivers';
+  render();
+  alert('Account unlocked for '+email);
+};
+
 window.saveCG=async function(){
   const name=($('cg-n').value||'').trim();
   const phone=($('cg-ph').value||'').trim();
-  const email=($('cg-em').value||'').trim();
+  const email=($('cg-em').value||'').trim().toLowerCase();
   const pw=($('cg-pw').value||'').trim();
   if(!name||!email){setMsg('cg-msg','Name and email are required.','merr');return;}
-  showLoading('cg-msg','Saving caregiver...');
+  showLoading('cg-msg','Saving...');
+  // Check for duplicate email
+  if(!EDIT_CG){
+    const existing = DB.caregivers.find(c=>c.email.toLowerCase()===email);
+    if(existing){setMsg('cg-msg','A caregiver with that email already exists.','merr');return;}
+    if(!pw||pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
+    // Check duplicate password
+    const dupPw = DB.caregivers.find(c=>c.tempPass===pw);
+    if(dupPw){setMsg('cg-msg','That password is already used by another caregiver. Please choose a unique password.','merr');return;}
+  }
   try{
     if(EDIT_CG){
       const updates={name,phone,updatedAt:Date.now()};
-      if(pw&&pw.length>=6) updates.tempPass=pw;
-      else if(pw&&pw.length>0&&pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
+      if(pw&&pw.length>=6){
+        // Check duplicate password (excluding current caregiver)
+        const dupPw=DB.caregivers.find(c=>c.tempPass===pw&&c.id!==EDIT_CG.id);
+        if(dupPw){setMsg('cg-msg','That password is already used by another caregiver.','merr');return;}
+        updates.tempPass=pw;
+      } else if(pw&&pw.length>0&&pw.length<6){
+        setMsg('cg-msg','Password must be at least 6 characters.','merr');return;
+      }
       await fsSet('caregivers',EDIT_CG.id,updates);
       EDIT_CG=null;
     } else {
-      if(!pw||pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
       const id=uid();
       await fsSet('caregivers',id,{name,email,phone,tempPass:pw,createdAt:Date.now()});
     }
