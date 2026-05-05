@@ -592,11 +592,13 @@ function buildSupAS(){
   const ed=EDIT_AS;
   const listRows=DB.assignments.length?DB.assignments.map(as=>{
     const cg=getCG(as.cgId);const cl=getCL(as.clientId);
+    const timeStr=as.shiftStart&&as.shiftEnd?` • ${as.shiftStart} – ${as.shiftEnd}`:'';
+    const minStr=as.minHours?` • Min ${as.minHours}h/day`:'';
     return`<div class="row">
       <div>
         <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg?.name||'?'} &rarr; ${cl?.name||'?'}</div>
-        <div style="font-size:12px;color:var(--tx2)">${as.startDate||'No start'} &ndash; ${as.endDate||'Ongoing'}</div>
-        <div style="font-size:12px;color:var(--tx3)">${cl?.schedule||''}</div>
+        <div style="font-size:12px;color:var(--tx2)">${as.startDate||'No start'} &ndash; ${as.endDate||'Ongoing'}${timeStr}</div>
+        <div style="font-size:12px;color:var(--tx3)">${as.workDays||cl?.schedule||''}${minStr}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         <button class="btn-icon" onclick="window.editAS('${as.id}')">&#9998;</button>
@@ -618,11 +620,25 @@ function buildSupAS(){
         ${DB.clients.map(c=>`<option value="${c.id}"${ed?.clientId===c.id?' selected':''}>${c.name}</option>`).join('')}
       </select>
     </div>
+    <div class="div"></div>
+    <div class="sec-label">Assignment dates</div>
     <div class="frow">
       <div class="fld"><label>Start date</label><input id="as-sd" type="date" value="${ed?.startDate||''}"></div>
       <div class="fld"><label>End date</label><input id="as-ed" type="date" value="${ed?.endDate||''}"></div>
     </div>
-    <div class="fld"><label>Notes (optional)</label><textarea id="as-nt" placeholder="Assignment notes...">${ed?.notes||''}</textarea></div>
+    <div class="div"></div>
+    <div class="sec-label">Work schedule &amp; hours</div>
+    <div class="fld"><label>Work days</label><input id="as-days" value="${ed?.workDays||''}" placeholder="e.g. Monday, Wednesday, Friday" autocomplete="off"></div>
+    <div class="frow">
+      <div class="fld"><label>Shift start time</label><input id="as-st" type="time" value="${ed?.shiftStart||''}"></div>
+      <div class="fld"><label>Shift end time</label><input id="as-et" type="time" value="${ed?.shiftEnd||''}"></div>
+    </div>
+    <div class="frow">
+      <div class="fld"><label>Minimum hours / day</label><input id="as-minh" type="number" min="0.5" max="24" step="0.5" value="${ed?.minHours||''}" placeholder="e.g. 1"></div>
+      <div class="fld"><label>Maximum hours / day</label><input id="as-maxh" type="number" min="0.5" max="24" step="0.5" value="${ed?.maxHours||''}" placeholder="e.g. 8"></div>
+    </div>
+    <div class="div"></div>
+    <div class="fld"><label>Notes (optional)</label><textarea id="as-nt" placeholder="Any additional instructions...">${ed?.notes||''}</textarea></div>
     <div id="as-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-g" onclick="window.saveAS()">${ed?'Save changes':'Create assignment'}</button>
@@ -642,7 +658,18 @@ window.saveAS=async function(){
   const cgId=($('as-cg').value||'').trim();
   const clientId=($('as-cl').value||'').trim();
   if(!cgId||!clientId){setMsg('as-msg','Please select both caregiver and client.','merr');return;}
-  const data={cgId,clientId,startDate:$('as-sd').value||'',endDate:$('as-ed').value||'',notes:$('as-nt').value||'',updatedAt:Date.now()};
+  const data={
+    cgId,clientId,
+    startDate:$('as-sd').value||'',
+    endDate:$('as-ed').value||'',
+    workDays:$('as-days').value||'',
+    shiftStart:$('as-st').value||'',
+    shiftEnd:$('as-et').value||'',
+    minHours:$('as-minh').value||'',
+    maxHours:$('as-maxh').value||'',
+    notes:$('as-nt').value||'',
+    updatedAt:Date.now()
+  };
   showLoading('as-msg','Saving assignment...');
   try{
     if(EDIT_AS){await fsSet('assignments',EDIT_AS.id,data);EDIT_AS=null;}
@@ -785,9 +812,12 @@ function buildCGAssignment(cg,as,cl){
     <div class="sec-label">Client information</div>
     <div class="info-row"><div class="info-key">Street</div><div class="info-val">${[cl.street,cl.apt].filter(Boolean).join(', ')||cl.address||'Not set'}</div></div>
     <div class="info-row"><div class="info-key">City / State / ZIP</div><div class="info-val">${[cl.city,cl.state,cl.zip].filter(Boolean).join(', ')||'-'}</div></div>
-    <div class="info-row"><div class="info-key">Schedule</div><div class="info-val">${cl.schedule||'Not specified'}</div></div>
+    <div class="info-row"><div class="info-key">Work days</div><div class="info-val">${as.workDays||cl.schedule||'Not specified'}</div></div>
+    <div class="info-row"><div class="info-key">Shift hours</div><div class="info-val">${as.shiftStart&&as.shiftEnd?as.shiftStart+' – '+as.shiftEnd:'Not set'}</div></div>
+    <div class="info-row"><div class="info-key">Min hours/day</div><div class="info-val">${as.minHours?as.minHours+'h minimum per day':'Not set'}</div></div>
     <div class="info-row"><div class="info-key">Start date</div><div class="info-val">${as.startDate||'Not set'}</div></div>
     <div class="info-row"><div class="info-key">End date</div><div class="info-val">${as.endDate||'Ongoing'}</div></div>
+    ${as.notes?`<div class="info-row"><div class="info-key">Notes</div><div class="info-val">${as.notes}</div></div>`:''}
     ${cl.notes?`<div class="info-row"><div class="info-key">Care notes</div><div class="info-val">${cl.notes}</div></div>`:''}
   </div>
   <div class="card">
