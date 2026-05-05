@@ -50,11 +50,10 @@ body{padding-bottom:env(safe-area-inset-bottom);}
 .dr{background:var(--red);}
 .da{background:var(--amber);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:center;gap:8px;line-height:1.4;}
+.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:flex-start;gap:8px;line-height:1.4;}
 .g-ok{background:var(--green-l);color:var(--green-t);}
 .g-fail{background:var(--red-l);color:var(--red-t);}
 .g-neu{background:var(--amber-l);color:var(--amber-t);}
-.g-info{background:var(--blue-l);color:var(--blue-t);}
 .btn{width:100%;padding:13px;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
 .btn:active{transform:scale(.98);}
 .bg{background:var(--green);color:#fff;}.bg:hover{opacity:.9;}
@@ -92,23 +91,37 @@ body{padding-bottom:env(safe-area-inset-bottom);}
 .sscr{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bdr);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes sp{to{transform:rotate(360deg)}}
-.pin-box{background:var(--bg);border:1px dashed var(--bdr2);border-radius:var(--rs);padding:1rem;text-align:center;margin-bottom:.75rem;}
-.pin-box p{font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:.75rem;}
-.coords{font-size:12px;color:var(--green-t);font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums;}
-.step{display:flex;gap:10px;align-items:flex-start;margin-bottom:.75rem;}
-.step-num{width:22px;height:22px;border-radius:50%;background:var(--green-l);color:var(--green-t);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
-.step-txt{font-size:13px;color:var(--tx2);line-height:1.5;}
+/* Admin panel styles */
+.admin-lock{position:absolute;top:1rem;right:1rem;background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;padding:4px;}
+.admin-overlay{background:rgba(0,0,0,.5);position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
+.admin-modal{background:var(--card);border-radius:var(--r);padding:1.5rem;width:100%;max-width:400px;}
+.admin-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--blue-l);color:var(--blue-t);margin-bottom:1rem;}
+.coord-display{background:var(--bg);border-radius:var(--rs);padding:.75rem;font-size:12px;color:var(--tx2);font-variant-numeric:tabular-nums;margin-bottom:.75rem;line-height:1.6;}
+.coord-display strong{color:var(--tx);display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
 </style>
 </head>
 <body>
 <div id="app"></div>
+
 <script>
-const KEY='care_clock_v5';
+const KEY='care_clock_v6';
 function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}return{config:null,sessions:[]};}
 function save(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
 
 let data=load();
-let S={view:data.config?'main':'setup',tab:'clock',in:false,inTime:null,locOk:false,locChecked:false,locDist:null,locErr:null,timer:null,pinLat:null,pinLng:null,pinning:false};
+let S={
+  view:data.config?'main':'admin_setup',
+  tab:'clock',
+  in:false,inTime:null,
+  locOk:false,locChecked:false,locDist:null,locErr:null,
+  timer:null,
+  showAdmin:false,
+  adminAuth:false,
+  adminPinning:false
+};
+
+const ADMIN_PASS='admin1234'; // Default admin password - change in admin panel
+const MAX_DIST_FT=100; // 100 feet radius
 
 const $=id=>document.getElementById(id);
 function toRad(v){return v*Math.PI/180;}
@@ -127,77 +140,148 @@ function setMsg(id,html,cls){const e=$(id);if(e){e.className='smsg '+cls;e.inner
 
 function render(){
   const app=$('app');app.innerHTML='';clearInterval(S.timer);
-  if(S.view==='setup'){app.appendChild(bSetup());return;}
-  app.appendChild(bHeader());app.appendChild(bTabs());
+  if(S.view==='admin_setup'){app.appendChild(bAdminSetup());return;}
+  if(S.showAdmin){app.appendChild(bAdminOverlay());}
+  app.appendChild(bHeader());
+  app.appendChild(bTabs());
   if(S.tab==='clock'){app.appendChild(bClock());startTick();}
   else if(S.tab==='log')app.appendChild(bLog());
   else if(S.tab==='sheet')app.appendChild(bSheet());
-  else if(S.tab==='settings')app.appendChild(bSettings());
 }
 
-function bSetup(){
+/* ── ADMIN SETUP (first time) ── */
+function bAdminSetup(){
   const w=document.createElement('div');w.style.padding='1.5rem 0';
-  w.innerHTML=`<div class="card">
+  w.innerHTML=`
+  <div class="card">
     <div style="text-align:center;margin-bottom:1.5rem">
-      <div style="width:60px;height:60px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;margin:0 auto .875rem;font-size:26px">&#128305;</div>
-      <div style="font-size:22px;font-weight:700;color:var(--tx)">Care Clock</div>
-      <div style="font-size:14px;color:var(--tx2);margin-top:4px">Set up your caregiver time tracker</div>
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;margin:0 auto .875rem;font-size:26px">&#128274;</div>
+      <div style="font-size:22px;font-weight:700;color:var(--tx)">Supervisor Setup</div>
+      <div style="font-size:14px;color:var(--tx2);margin-top:4px">Configure Care Clock for your caregiver</div>
     </div>
-    <div class="fld"><label>Family name</label><input id="sf" placeholder="e.g. Johnson Family" autocomplete="off"></div>
-    <div class="fld"><label>Caregiver name</label><input id="sc" placeholder="e.g. Maria Garcia" autocomplete="off"></div>
-    <div class="fld"><label>Care address (for display)</label><input id="sa" placeholder="9304 Forest Lane, Dallas, TX 75243" autocomplete="off"><div class="hint">This is shown on the clock screen. Location is set by GPS pin below.</div></div>
+    <div class="admin-badge">&#128274; Supervisor only</div>
+    <div class="fld"><label>Family / Client name</label><input id="af" placeholder="e.g. Brukeyey Family" autocomplete="off"></div>
+    <div class="fld"><label>Caregiver name</label><input id="ac" placeholder="e.g. Edwinia Roberson" autocomplete="off"></div>
+    <div class="fld"><label>Care address (for display)</label><input id="aa" placeholder="9304 Forest Lane, Dallas, TX 75243" autocomplete="off"></div>
+    <div class="fld"><label>Supervisor password</label><input id="ap" type="password" placeholder="Set a password to protect settings" autocomplete="off"><div class="hint">You will need this to access supervisor settings later. Default is: admin1234</div></div>
     <div class="div"></div>
-    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.75rem">Set the care location</div>
-    <div style="margin-bottom:.875rem">
-      <div class="step"><div class="step-num">1</div><div class="step-txt">Go to the care home address (or you can set it manually from there later in Settings).</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-txt">Tap <strong>Pin my current location</strong>. This saves the GPS coordinates of the care address.</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-txt">Your caregiver must be within 300 ft of this pinned location to clock in.</div></div>
+    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.75rem">Pin the care location</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:.875rem;line-height:1.6;">Go to the care home address and tap the button below to save its exact GPS location. The caregiver must be within <strong>100 ft</strong> of this location to clock in.</div>
+    <div style="background:var(--bg);border:1px dashed var(--bdr2);border-radius:var(--rs);padding:1rem;margin-bottom:.75rem;text-align:center;">
+      <button class="btn bo" id="apin-btn" onclick="adminPin()" style="margin-bottom:8px">&#x1F4CD; Pin care location now</button>
+      <div id="apin-status" style="font-size:12px;min-height:18px;font-variant-numeric:tabular-nums;"></div>
     </div>
-    <div class="pin-box">
-      <p>Tap the button below while standing at (or near) the care address to save its GPS location.</p>
-      <button class="btn bo" id="pin-btn" onclick="pinLocation()" style="margin-bottom:8px">&#x1F4CD; Pin my current location</button>
-      <div id="pin-status" class="coords" style="min-height:18px"></div>
-    </div>
-    <div id="s-msg" class="smsg mneu"></div>
-    <button class="btn bg" id="s-save" onclick="doSetup()">Save &amp; open app</button>
+    <div id="as-msg" class="smsg mneu"></div>
+    <button class="btn bg" id="as-save" onclick="adminSave()">Save &amp; launch app</button>
   </div>`;
-  if(S.pinLat){$('pin-status').textContent=`Pinned: ${S.pinLat.toFixed(5)}, ${S.pinLng.toFixed(5)}`;}
   return w;
 }
 
+/* ── ADMIN OVERLAY (password protected) ── */
+function bAdminOverlay(){
+  const cfg=data.config||{};
+  const w=document.createElement('div');
+  w.className='admin-overlay';
+  w.onclick=e=>{if(e.target===w){S.showAdmin=false;S.adminAuth=false;render();}};
+
+  if(!S.adminAuth){
+    w.innerHTML=`<div class="admin-modal">
+      <div style="font-size:18px;font-weight:700;color:var(--tx);margin-bottom:4px">Supervisor access</div>
+      <div style="font-size:13px;color:var(--tx2);margin-bottom:1rem">Enter your supervisor password to continue.</div>
+      <div class="fld"><label>Password</label><input id="adm-pw" type="password" placeholder="Enter password" autocomplete="off"></div>
+      <div id="adm-msg" class="smsg merr" style="min-height:16px"></div>
+      <button class="btn bg" onclick="checkAdminPass()">Unlock</button>
+      <button class="btn bo" style="margin-top:.5rem" onclick="closeAdmin()">Cancel</button>
+    </div>`;
+  } else {
+    w.innerHTML=`<div class="admin-modal" style="max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div>
+          <div class="admin-badge">&#128274; Supervisor panel</div>
+          <div style="font-size:18px;font-weight:700;color:var(--tx)">Settings</div>
+        </div>
+        <button style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx3)" onclick="closeAdmin()">&#x2715;</button>
+      </div>
+      <div class="fld"><label>Family / Client name</label><input id="cfg-f" value="${cfg.familyName||''}" autocomplete="off"></div>
+      <div class="fld"><label>Caregiver name</label><input id="cfg-c" value="${cfg.caregiverName||''}" autocomplete="off"></div>
+      <div class="fld"><label>Care address (display)</label><input id="cfg-a" value="${cfg.address||''}" autocomplete="off"></div>
+      <div class="fld"><label>New supervisor password</label><input id="cfg-p" type="password" placeholder="Leave blank to keep current" autocomplete="off"></div>
+      <div class="div"></div>
+      <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.5rem">Care location (GPS)</div>
+      <div class="coord-display">
+        <strong>Current pinned location</strong>
+        ${cfg.lat ? `Lat: ${cfg.lat.toFixed(6)}<br>Lng: ${cfg.lng.toFixed(6)}<br>Radius: 100 ft` : 'No location pinned yet'}
+      </div>
+      <button class="btn bo" id="repin-btn" onclick="adminRepin()" style="margin-bottom:.75rem">&#x1F4CD; Re-pin care location</button>
+      <div id="repin-status" style="font-size:12px;min-height:16px;margin-bottom:.75rem;font-variant-numeric:tabular-nums;color:var(--green-t)"></div>
+      <div id="cfg-msg" class="smsg mneu"></div>
+      <button class="btn bg" style="margin-bottom:.5rem" onclick="adminUpdate()">Save changes</button>
+      <div class="div"></div>
+      <button class="bdel" onclick="adminClearSessions()">Clear all shift data</button>
+    </div>`;
+  }
+  return w;
+}
+
+/* ── MAIN HEADER ── */
 function bHeader(){
-  const cfg=data.config||{},d=document.createElement('div');d.className='hrow';
-  d.innerHTML=`<div><div style="font-size:20px;font-weight:700;color:var(--tx)">${cfg.familyName||'Care Clock'}</div><div style="font-size:13px;color:var(--tx2);margin-top:2px">${cfg.caregiverName||'Caregiver'}</div></div><div class="av">${ini(cfg.caregiverName)}</div>`;
+  const cfg=data.config||{};
+  const d=document.createElement('div');d.className='hrow';d.style.position='relative';
+  d.innerHTML=`
+    <div>
+      <div style="font-size:20px;font-weight:700;color:var(--tx)">${cfg.familyName||'Care Clock'}</div>
+      <div style="font-size:13px;color:var(--tx2);margin-top:2px">${cfg.caregiverName||'Caregiver'}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="admin-lock" onclick="openAdmin()" title="Supervisor access" style="position:static">&#9881;&#65039;</button>
+      <div class="av">${ini(cfg.caregiverName)}</div>
+    </div>`;
   return d;
 }
 
+/* ── TABS ── */
 function bTabs(){
   const row=document.createElement('div');row.className='tabs';
-  [['clock','Clock'],['log','Today'],['sheet','Timesheet'],['settings','Settings']].forEach(([id,lbl])=>{
+  [['clock','Clock'],['log','Today'],['sheet','Timesheet']].forEach(([id,lbl])=>{
     const b=document.createElement('button');b.className='tab'+(S.tab===id?' on':'');b.textContent=lbl;b.onclick=()=>{S.tab=id;render();};row.appendChild(b);
   });
   return row;
 }
 
+/* ── CLOCK TAB ── */
 function bClock(){
   const elapsed=S.in&&S.inTime?Date.now()-S.inTime:0;
-  const gHtml=!S.locChecked
-    ?`<div class="geo g-neu"><div class="dot da"></div><span>Tap below to verify your location</span></div>`
-    :S.locOk
-      ?`<div class="geo g-ok"><div class="dot dg"></div><span>Within range &mdash; ${Math.round(S.locDist)} ft from care address</span></div>`
-      :`<div class="geo g-fail"><div class="dot dr"></div><span>${S.locDist!==null?`Too far &mdash; ${Math.round(S.locDist)} ft away (300 ft max)`:S.locErr||'Location check failed'}</span></div>`;
+  let gHtml='';
+  if(!S.locChecked){
+    gHtml=`<div class="geo g-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Tap below to verify your location</span></div>`;
+  } else if(S.locOk){
+    gHtml=`<div class="geo g-ok"><div class="dot dg" style="margin-top:3px;flex-shrink:0"></div><span>You are within range &mdash; ${Math.round(S.locDist)} ft from the care address</span></div>`;
+  } else {
+    const msg=S.locDist!==null
+      ?`You are too far away &mdash; ${Math.round(S.locDist)} ft from the care address. You must be within 100 ft to clock in. Please go to the care location.`
+      :(S.locErr||'Could not get your location. Please try again.');
+    gHtml=`<div class="geo g-fail"><div class="dot dr" style="margin-top:3px;flex-shrink:0"></div><span>${msg}</span></div>`;
+  }
   const badge=S.in?`<div class="bdg bdg-in"><div class="dot dg"></div>Clocked in</div>`:`<div class="bdg bdg-out"><div class="dot dr"></div>Clocked out</div>`;
-  const mainBtn=S.in?`<button class="btn br" onclick="doClock()">Clock out</button>`:S.locOk?`<button class="btn bg" onclick="doClock()">Clock in</button>`:`<button class="btn" disabled>Check location to clock in</button>`;
+  const mainBtn=S.in
+    ?`<button class="btn br" onclick="doClock()">Clock out</button>`
+    :S.locOk
+      ?`<button class="btn bg" onclick="doClock()">Clock in</button>`
+      :`<button class="btn" disabled>You must be within 100 ft to clock in</button>`;
   const w=document.createElement('div');
-  w.innerHTML=`<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">${badge}<div class="eld" id="eld" style="${S.in?'':'display:none'}">${fEl(elapsed)}</div></div>
+  w.innerHTML=`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      ${badge}
+      <div class="eld" id="eld" style="${S.in?'':'display:none'}">${fEl(elapsed)}</div>
+    </div>
     <div class="tbig" id="cf">${fT(Date.now())}</div>
     <div class="dsm">${fD(Date.now())}</div>
     <div class="div"></div>
     ${gHtml}
     <button class="btn bo" style="margin-bottom:.75rem" id="geo-btn" onclick="checkGeo()">&#x1F4CD; Verify my location</button>
     ${mainBtn}
-    <div class="noti">Must be within 300 ft of ${data.config?.address||'care address'}</div>
+    <div class="noti">You must be within 100 ft of ${data.config?.address||'the care address'}</div>
   </div>
   <div class="card">
     <div class="lbl">Today at a glance</div>
@@ -209,6 +293,7 @@ function bClock(){
   return w;
 }
 
+/* ── LOG TAB ── */
 function bLog(){
   const sess=todayS(),total=totMs(sess);
   const tRows=sess.length?sess.map((s,i)=>`<div class="lrow"><span class="ll">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime)}</span><span class="lv">${fHM(s.outTime-s.inTime)}</span></div>`).join(''):`<div class="emp">No shifts recorded today</div>`;
@@ -217,44 +302,41 @@ function bLog(){
   week.forEach(s=>{const d=fDs(s.inTime);(gr[d]=gr[d]||[]).push(s);});
   const wHtml=week.length?Object.entries(gr).map(([day,ss])=>`<div class="wdl">${day}</div>${ss.map((s,i)=>`<div class="lrow"><span class="ll">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime)}</span><span class="lv">${fHM(s.outTime-s.inTime)}</span></div>`).join('')}`).join(''):`<div class="emp">No shifts this week</div>`;
   const w=document.createElement('div');
-  w.innerHTML=`<div class="card"><div class="lbl">Today's log</div>${tRows}${totHtml}</div>
-  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem"><div class="lbl" style="margin:0">This week</div><span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(wt)}</span></div>${wHtml}</div>`;
+  w.innerHTML=`
+  <div class="card"><div class="lbl">Today's log</div>${tRows}${totHtml}</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <div class="lbl" style="margin:0">This week</div>
+      <span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(wt)}</span>
+    </div>
+    ${wHtml}
+  </div>`;
   return w;
 }
 
+/* ── SHEET TAB ── */
 function bSheet(){
   const sess=data.sessions.slice().reverse(),total=totMs(data.sessions);
   const rows=sess.length?sess.map(s=>`<tr><td>${fDs(s.inTime)}</td><td>${fT2(s.inTime)}</td><td>${fT2(s.outTime)}</td><td style="font-weight:700;color:var(--green)">${fHM(s.outTime-s.inTime)}</td></tr>`).join(''):`<tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:2rem">No sessions yet</td></tr>`;
   const w=document.createElement('div');
-  w.innerHTML=`<div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem"><div class="lbl" style="margin:0">All shifts</div><button class="bsm" onclick="exportCSV()">Export CSV</button></div>
-    <div class="sscr"><table class="stbl"><thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hours</th></tr></thead><tbody>${rows}</tbody></table></div>
+  w.innerHTML=`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem">
+      <div class="lbl" style="margin:0">All shifts</div>
+      <button class="bsm" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div class="sscr">
+      <table class="stbl">
+        <thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hours</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
     ${sess.length?`<div class="div"></div><div class="trow"><span style="font-size:14px;font-weight:600;color:var(--tx2)">All-time total</span><span style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(total)}</span></div>`:''}
   </div>`;
   return w;
 }
 
-function bSettings(){
-  const cfg=data.config||{},w=document.createElement('div');
-  w.innerHTML=`<div class="card">
-    <div class="lbl">Profile</div>
-    <div class="fld"><label>Family name</label><input id="cf" value="${cfg.familyName||''}" autocomplete="off"></div>
-    <div class="fld"><label>Caregiver name</label><input id="cc" value="${cfg.caregiverName||''}" autocomplete="off"></div>
-    <div class="fld"><label>Care address (display only)</label><input id="ca" value="${cfg.address||''}" autocomplete="off"></div>
-    <div class="div"></div>
-    <div class="lbl">Care location (GPS)</div>
-    <div class="pin-box">
-      <p>To update the GPS pin, go to the care address and tap the button below.</p>
-      <button class="btn bo" onclick="pinLocationSettings()" style="margin-bottom:8px">&#x1F4CD; Re-pin care location</button>
-      <div id="pin-cfg-status" class="coords" style="min-height:18px">${cfg.lat?`Current pin: ${cfg.lat.toFixed(5)}, ${cfg.lng.toFixed(5)}`:''}</div>
-    </div>
-    <div id="cfg-msg" class="smsg mneu"></div>
-    <button class="btn bg" style="margin-bottom:.75rem" onclick="saveConfig()">Save settings</button>
-    <button class="bdel" onclick="clearAll()">Clear all data</button>
-  </div>`;
-  return w;
-}
-
+/* ── TICK ── */
 function startTick(){
   S.timer=setInterval(()=>{
     const cf=$('cf');if(cf)cf.textContent=fT(Date.now());
@@ -262,82 +344,111 @@ function startTick(){
   },1000);
 }
 
-function pinLocation(){
-  const btn=$('pin-btn'),st=$('pin-status');
+/* ── ADMIN FUNCTIONS ── */
+function openAdmin(){S.showAdmin=true;S.adminAuth=false;render();}
+function closeAdmin(){S.showAdmin=false;S.adminAuth=false;render();}
+
+function checkAdminPass(){
+  const pw=$('adm-pw').value;
+  const stored=data.config?.adminPass||ADMIN_PASS;
+  if(pw===stored){S.adminAuth=true;render();}
+  else{const m=$('adm-msg');if(m){m.textContent='Incorrect password. Try again.';}}
+}
+
+function adminPin(){
+  const btn=$('apin-btn'),st=$('apin-status');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
-  if(st)st.textContent='';
+  if(st){st.style.color='var(--tx3)';st.textContent='Locating...';}
   if(!navigator.geolocation){
-    if(st)st.style.color='var(--red-t)',st.textContent='Geolocation not supported.';
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin my current location';}
+    if(st){st.style.color='var(--red-t)';st.textContent='Geolocation not supported.';}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin care location now';}
     return;
   }
   navigator.geolocation.getCurrentPosition(pos=>{
-    S.pinLat=pos.coords.latitude;S.pinLng=pos.coords.longitude;
-    if(st){st.style.color='var(--green-t)';st.textContent=`Pinned: ${S.pinLat.toFixed(5)}, ${S.pinLng.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin my current location';}
+    window._adminPinLat=pos.coords.latitude;
+    window._adminPinLng=pos.coords.longitude;
+    if(st){st.style.color='var(--green-t)';st.textContent=`Pinned: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Location pinned! Tap again to update';}
   },err=>{
-    const msg=err.code===1?'Location permission denied.':'Could not get location. Try again.';
+    const msg=err.code===1?'Permission denied. Allow location access.':'Could not get location. Try again.';
     if(st){st.style.color='var(--red-t)';st.textContent=msg;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin my current location';}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin care location now';}
   },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
 
-function pinLocationSettings(){
-  const btn=document.querySelector('[onclick="pinLocationSettings()"]'),st=$('pin-cfg-status');
+function adminRepin(){
+  const btn=$('repin-btn'),st=$('repin-status');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
-  if(!navigator.geolocation){if(st){st.style.color='var(--red-t)';st.textContent='Not supported.';}if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Re-pin care location';}return;}
   navigator.geolocation.getCurrentPosition(pos=>{
     if(data.config){data.config.lat=pos.coords.latitude;data.config.lng=pos.coords.longitude;save(data);}
     S.locChecked=false;S.locOk=false;
-    if(st){st.style.color='var(--green-t)';st.textContent=`Updated: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Re-pin care location';}
+    if(st){st.textContent=`Updated: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Re-pinned! Tap again to update';}
   },err=>{
-    const msg=err.code===1?'Permission denied.':'Could not get location.';
-    if(st){st.style.color='var(--red-t)';st.textContent=msg;}
+    if(st){st.style.color='var(--red-t)';st.textContent=err.code===1?'Permission denied.':'Could not get location.';}
     if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Re-pin care location';}
   },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
 
-function doSetup(){
-  const f=$('sf').value.trim(),c=$('sc').value.trim(),a=$('sa').value.trim(),btn=$('s-save');
-  if(!f||!c||!a){setMsg('s-msg','Please fill in all fields.','merr');return;}
-  if(!S.pinLat){setMsg('s-msg','Please pin the care location using the button above first.','merr');return;}
-  data.config={familyName:f,caregiverName:c,address:a,lat:S.pinLat,lng:S.pinLng};
+function adminSave(){
+  const f=$('af').value.trim(),c=$('ac').value.trim(),a=$('aa').value.trim(),p=$('ap').value.trim();
+  if(!f||!c||!a){setMsg('as-msg','Please fill in all fields.','merr');return;}
+  if(!window._adminPinLat){setMsg('as-msg','Please pin the care location first.','merr');return;}
+  data.config={
+    familyName:f,caregiverName:c,address:a,
+    lat:window._adminPinLat,lng:window._adminPinLng,
+    adminPass:p||ADMIN_PASS
+  };
   save(data);S.view='main';S.tab='clock';render();
 }
 
-function saveConfig(){
-  const f=$('cf').value.trim(),c=$('cc').value.trim(),a=$('ca').value.trim();
+function adminUpdate(){
+  const f=$('cfg-f').value.trim(),c=$('cfg-c').value.trim(),a=$('cfg-a').value.trim(),p=$('cfg-p').value.trim();
   if(!f||!c||!a){setMsg('cfg-msg','Please fill in all fields.','merr');return;}
   data.config={...data.config,familyName:f,caregiverName:c,address:a};
-  save(data);setMsg('cfg-msg','Saved!','mok');
-  setTimeout(()=>{S.tab='clock';render();},700);
+  if(p)data.config.adminPass=p;
+  save(data);
+  S.locChecked=false;S.locOk=false;
+  setMsg('cfg-msg','Saved!','mok');
+  setTimeout(()=>{closeAdmin();},800);
 }
 
+function adminClearSessions(){
+  if(!confirm('Delete ALL shift records? This cannot be undone.'))return;
+  data.sessions=[];save(data);
+  setMsg('cfg-msg','All shift data cleared.','mok');
+  setTimeout(()=>{closeAdmin();},800);
+}
+
+/* ── GEOLOCATION CHECK ── */
 function checkGeo(){
-  const btn=$('geo-btn');if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting location...';}
-  if(!navigator.geolocation){S.locChecked=true;S.locOk=false;S.locErr='Geolocation not supported.';render();return;}
-  if(!data.config?.lat){S.locChecked=true;S.locOk=false;S.locErr='No care location pinned. Go to Settings.';render();return;}
+  const btn=$('geo-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting location...';}
+  if(!navigator.geolocation){S.locChecked=true;S.locOk=false;S.locErr='Geolocation not supported on this device.';render();return;}
+  if(!data.config?.lat){S.locChecked=true;S.locOk=false;S.locErr='No care location set. Contact your supervisor.';render();return;}
   navigator.geolocation.getCurrentPosition(
-    pos=>{const d=distFt(pos.coords.latitude,pos.coords.longitude,data.config.lat,data.config.lng);S.locChecked=true;S.locDist=d;S.locOk=d<=300;S.locErr=null;render();},
-    err=>{S.locChecked=true;S.locOk=false;S.locDist=null;S.locErr=err.code===1?'Location permission denied. Allow access in browser settings.':'Could not get location. Try again.';render();},
+    pos=>{
+      const d=distFt(pos.coords.latitude,pos.coords.longitude,data.config.lat,data.config.lng);
+      S.locChecked=true;S.locDist=d;S.locOk=d<=MAX_DIST_FT;S.locErr=null;
+      render();
+    },
+    err=>{
+      S.locChecked=true;S.locOk=false;S.locDist=null;
+      S.locErr=err.code===1?'Location permission denied. Please allow location access in your browser settings.':'Could not get your location. Please try again.';
+      render();
+    },
     {enableHighAccuracy:true,timeout:12000,maximumAge:30000}
   );
 }
 
+/* ── CLOCK IN / OUT ── */
 function doClock(){
   if(S.in){data.sessions.push({inTime:S.inTime,outTime:Date.now()});save(data);S.in=false;S.inTime=null;}
   else{S.in=true;S.inTime=Date.now();}
   render();
 }
 
-function clearAll(){
-  if(!confirm('Delete ALL shift data and settings? This cannot be undone.'))return;
-  data={config:null,sessions:[]};save(data);
-  S={view:'setup',tab:'clock',in:false,inTime:null,locOk:false,locChecked:false,locDist:null,locErr:null,timer:null,pinLat:null,pinLng:null};
-  render();
-}
-
+/* ── EXPORT CSV ── */
 function exportCSV(){
   const hdr=['Date','Clock In','Clock Out','Duration (hrs)','Duration (min)'];
   const rows=data.sessions.map(s=>{const ms=s.outTime-s.inTime;return[fDs(s.inTime),fT2(s.inTime),fT2(s.outTime),(ms/3600000).toFixed(2),Math.round(ms/60000)];});
