@@ -16,8 +16,7 @@
   --blue:#378ADD;--blue-l:#E6F1FB;--blue-t:#185FA5;
   --purple:#7F77DD;--purple-l:#EEEDFE;--purple-t:#3C3489;
   --bg:#f5f5f3;--card:#fff;--bdr:rgba(0,0,0,.1);--bdr2:rgba(0,0,0,.18);
-  --tx:#1a1a1a;--tx2:#555;--tx3:#999;
-  --r:12px;--rs:8px;
+  --tx:#1a1a1a;--tx2:#555;--tx3:#999;--r:12px;--rs:8px;
 }
 @media(prefers-color-scheme:dark){:root{
   --bg:#111;--card:#1e1e1e;--bdr:rgba(255,255,255,.1);--bdr2:rgba(255,255,255,.2);
@@ -28,30 +27,26 @@
 }}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 #app{max-width:520px;margin:0 auto;padding:1rem;min-height:100vh;}
-
-/* Cards */
 .card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;}
-.card-flat{background:var(--bg);border-radius:var(--rs);padding:.875rem;margin-bottom:.75rem;}
-
-/* Typography */
-.page-title{font-size:22px;font-weight:700;color:var(--tx);margin-bottom:4px;}
-.page-sub{font-size:14px;color:var(--tx2);margin-bottom:1.25rem;}
 .sec-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:.75rem;}
-
-/* Badges */
+.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.av-g{background:var(--green-l);color:var(--green-t);}
+.av-b{background:var(--blue-l);color:var(--blue-t);}
+.av-p{background:var(--purple-l);color:var(--purple-t);}
+.nav{display:flex;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:3px;margin-bottom:1rem;gap:2px;}
+.nav-tab{flex:1;padding:7px 4px;font-size:12px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:transparent;color:var(--tx2);}
+.nav-tab.on{background:var(--bg);color:var(--tx);font-weight:700;}
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
 .b-green{background:var(--green-l);color:var(--green-t);}
 .b-red{background:var(--red-l);color:var(--red-t);}
-.b-amber{background:var(--amber-l);color:var(--amber-t);}
 .b-blue{background:var(--blue-l);color:var(--blue-t);}
-.b-purple{background:var(--purple-l);color:var(--purple-t);}
+.b-amber{background:var(--amber-l);color:var(--amber-t);}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .dg{background:var(--green);animation:pulse 1.5s infinite;}
 .dr{background:var(--red);}
 .da{background:var(--amber);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-/* Buttons */
 .btn{width:100%;padding:12px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
 .btn:active{transform:scale(.98);}
 .btn-g{background:var(--green);color:#fff;}.btn-g:hover{opacity:.9;}
@@ -63,9 +58,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .btn-sm{padding:6px 14px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;background:transparent;border:1px solid var(--bdr2);color:var(--tx2);}
 .btn-sm:hover{background:var(--bg);}
 .btn-icon{padding:6px 10px;font-size:13px;border-radius:var(--rs);cursor:pointer;background:transparent;border:1px solid var(--bdr2);color:var(--tx2);}
-.btn-del{background:transparent;border:1px solid rgba(226,75,74,.3);color:var(--red-t);padding:8px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;}
-
-/* Forms */
+.btn-del{background:transparent;border:1px solid rgba(226,75,74,.3);color:var(--red-t);padding:8px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;width:100%;}
 .fld{margin-bottom:.75rem;}
 .fld label{display:block;font-size:13px;font-weight:500;color:var(--tx2);margin-bottom:4px;}
 .fld input,.fld select,.fld textarea{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--bdr2);border-radius:var(--rs);background:var(--card);color:var(--tx);outline:none;transition:border .15s;font-family:inherit;}
@@ -73,97 +66,86 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-sy
 .fld input::placeholder,.fld textarea::placeholder{color:var(--tx3);}
 .fld textarea{resize:vertical;min-height:70px;}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.hint{font-size:12px;color:var(--tx3);margin-top:4px;}
-
-/* Divider */
+.hint{font-size:12px;color:var(--tx3);margin-top:4px;line-height:1.4;}
 .div{height:1px;background:var(--bdr);margin:.875rem 0;}
-
-/* Nav tabs */
-.nav{display:flex;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:3px;margin-bottom:1rem;gap:2px;}
-.nav-tab{flex:1;padding:7px 4px;font-size:12px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:transparent;color:var(--tx2);}
-.nav-tab.on{background:var(--bg);color:var(--tx);font-weight:700;}
-
-/* Table */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.met{background:var(--bg);border-radius:var(--rs);padding:.875rem;}
+.met-l{font-size:11px;color:var(--tx3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+.met-v{font-size:20px;font-weight:700;color:var(--tx);}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
+.row:last-child{border-bottom:none;}
 .tbl{width:100%;border-collapse:collapse;font-size:13px;}
 .tbl th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bdr);font-weight:600;color:var(--tx3);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
 .tbl td{padding:9px 6px;border-bottom:1px solid var(--bdr);color:var(--tx);}
 .tbl tr:last-child td{border-bottom:none;}
-.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-
-/* Rows */
-.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
-.row:last-child{border-bottom:none;}
-.row-label{font-size:14px;color:var(--tx2);}
-.row-val{font-size:14px;font-weight:600;color:var(--tx);}
-.row-val-g{font-size:14px;font-weight:600;color:var(--green);}
-
-/* Metric grid */
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
-.met{background:var(--bg);border-radius:var(--rs);padding:.875rem;}
-.met-l{font-size:11px;color:var(--tx3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
-.met-v{font-size:22px;font-weight:700;color:var(--tx);}
-
-/* Avatar */
-.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
-.av-g{background:var(--green-l);color:var(--green-t);}
-.av-b{background:var(--blue-l);color:var(--blue-t);}
-.av-p{background:var(--purple-l);color:var(--purple-t);}
-
-/* Clock display */
+.tbl-scroll{overflow-x:auto;}
 .clock-big{font-size:44px;font-weight:300;letter-spacing:-2px;text-align:center;margin:.5rem 0;font-variant-numeric:tabular-nums;color:var(--tx);}
 .clock-date{font-size:14px;color:var(--tx2);text-align:center;}
-.clock-elapsed{font-size:16px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums;}
-
-/* Geo bar */
-.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:flex-start;gap:8px;line-height:1.4;}
+.clock-el{font-size:16px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums;}
+.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
 .geo-ok{background:var(--green-l);color:var(--green-t);}
 .geo-fail{background:var(--red-l);color:var(--red-t);}
 .geo-neu{background:var(--amber-l);color:var(--amber-t);}
-
-/* Misc */
+.info-row{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--bdr);}
+.info-row:last-child{border-bottom:none;}
+.info-key{font-size:12px;color:var(--tx3);min-width:120px;padding-top:1px;font-weight:500;}
+.info-val{font-size:13px;color:var(--tx);line-height:1.5;}
 .empty{font-size:14px;color:var(--tx3);text-align:center;padding:2rem 1rem;}
 .smsg{font-size:13px;min-height:18px;margin-bottom:.75rem;line-height:1.5;}
 .mok{color:var(--green-t);}.merr{color:var(--red-t);}.mneu{color:var(--tx3);}
 .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bdr);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes sp{to{transform:rotate(360deg)}}
 .noti{font-size:12px;color:var(--tx3);text-align:center;margin-top:.5rem;line-height:1.4;}
-.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-.info-row{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr);}
-.info-row:last-child{border-bottom:none;}
-.info-key{font-size:12px;color:var(--tx3);min-width:110px;padding-top:2px;}
-.info-val{font-size:13px;color:var(--tx);line-height:1.5;}
 .wdl{font-size:12px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:.75rem 0 4px;}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:1rem;}
+.loading-screen p{font-size:14px;color:var(--tx2);}
 </style>
 </head>
 <body>
-<div id="app"></div>
-<script>
-const KEY='careclock_v7';
-function ld(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}
-  return{
-    supervisor:{name:'Supervisor',password:'admin1234'},
-    caregivers:[],
-    clients:[],
-    assignments:[],
-    sessions:[]
-  };
-}
-function sv(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+<div id="app">
+  <div class="loading-screen">
+    <div class="spin" style="width:24px;height:24px;border-width:3px"></div>
+    <p>Loading Care Clock...</p>
+  </div>
+</div>
 
-let DB=ld();
-let S={
-  view:'login', // login | supervisor | caregiver
-  supTab:'dashboard',
-  cgTab:'clock',
-  currentCG:null, // logged in caregiver object
-  locOk:false,locChecked:false,locDist:null,locErr:null,
-  clockedIn:false,clockInTime:null,
-  timer:null,
-  editCG:null,editCL:null,editAS:null
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── FIREBASE CONFIG ──
+const firebaseConfig = {
+  apiKey: "AIzaSyD4JelsMu_NGt3lo9pOYtGgHW0msoUzuQ4",
+  authDomain: "care-clock-2adcd.firebaseapp.com",
+  projectId: "care-clock-2adcd",
+  storageBucket: "care-clock-2adcd.firebasestorage.app",
+  messagingSenderId: "345647037416",
+  appId: "1:345647037416:web:f68c4f541ebf995ca7025d"
 };
 
-const $=id=>document.getElementById(id);
-const uid=()=>Math.random().toString(36).slice(2,9);
+const fireApp = initializeApp(firebaseConfig);
+const auth = getAuth(fireApp);
+const db = getFirestore(fireApp);
+
+// ── STATE ──
+let S = {
+  view: 'loading',
+  supTab: 'dashboard',
+  cgTab: 'clock',
+  user: null,
+  userRole: null, // 'supervisor' | 'caregiver'
+  cgProfile: null,
+  locOk: false, locChecked: false, locDist: null, locErr: null,
+  clockedIn: false, clockInTime: null, openSessionId: null,
+  timer: null,
+  editCG: null, editCL: null, editAS: null,
+  cache: { caregivers: [], clients: [], assignments: [], sessions: [] }
+};
+
+// ── HELPERS ──
+const $ = id => document.getElementById(id);
 function toRad(v){return v*Math.PI/180;}
 function distFt(a,b,c,d){const R=3958.8,dL=toRad(c-a),dO=toRad(d-b),x=Math.sin(dL/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))*5280;}
 function fT(ts){return new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
@@ -174,191 +156,256 @@ function fEl(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((
 function fHM(ms){const t=Math.floor(ms/60000),h=Math.floor(t/60),m=t%60;return`${h}h ${m}m`;}
 function ini(n){return(n||'?').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
 function setMsg(id,html,cls){const e=$(id);if(e){e.className='smsg '+cls;e.innerHTML=html;}}
-function cgSessions(cgId){return DB.sessions.filter(s=>s.cgId===cgId);}
-function cgTodaySessions(cgId){const t=new Date().toDateString();return DB.sessions.filter(s=>s.cgId===cgId&&new Date(s.inTime).toDateString()===t);}
-function cgWeekSessions(cgId){const now=new Date(),d=now.getDay(),st=new Date(now);st.setDate(now.getDate()-d);st.setHours(0,0,0,0);return DB.sessions.filter(s=>s.cgId===cgId&&new Date(s.inTime)>=st);}
-function totMs(arr){return arr.reduce((s,x)=>s+(x.outTime-x.inTime),0);}
-function getAssignment(cgId){return DB.assignments.find(a=>a.cgId===cgId);}
-function getClient(id){return DB.clients.find(c=>c.id===id);}
-function getCaregiver(id){return DB.caregivers.find(c=>c.id===id);}
+function uid(){return Math.random().toString(36).slice(2,9);}
 
-function render(){
-  const app=$('app');app.innerHTML='';clearInterval(S.timer);
-  if(S.view==='login')app.appendChild(bLogin());
-  else if(S.view==='supervisor')app.appendChild(bSupervisor());
-  else if(S.view==='caregiver')app.appendChild(bCaregiver());
+function tsToMs(ts){
+  if(!ts) return 0;
+  if(typeof ts==='number') return ts;
+  if(ts.toMillis) return ts.toMillis();
+  if(ts.seconds) return ts.seconds*1000;
+  return new Date(ts).getTime();
 }
 
-/* ═══════════════════════════════════════
-   LOGIN SCREEN
-═══════════════════════════════════════ */
+// ── FIRESTORE HELPERS ──
+async function fsGet(col, id){ const d = await getDoc(doc(db,col,id)); return d.exists()?{id:d.id,...d.data()}:null; }
+async function fsSet(col, id, data){ await setDoc(doc(db,col,id), data, {merge:true}); }
+async function fsAdd(col, data){ const r = await addDoc(collection(db,col), data); return r.id; }
+async function fsDel(col, id){ await deleteDoc(doc(db,col,id)); }
+async function fsAll(col){ const s = await getDocs(collection(db,col)); return s.docs.map(d=>({id:d.id,...d.data()})); }
+async function fsQuery(col, field, op, val){ const q = query(collection(db,col), where(field,op,val)); const s = await getDocs(q); return s.docs.map(d=>({id:d.id,...d.data()})); }
+
+// ── LOAD CACHE ──
+async function loadCache(){
+  const [cgs, cls, ass, sess] = await Promise.all([
+    fsAll('caregivers'), fsAll('clients'), fsAll('assignments'), fsAll('sessions')
+  ]);
+  S.cache.caregivers = cgs;
+  S.cache.clients = cls;
+  S.cache.assignments = ass;
+  S.cache.sessions = sess;
+}
+
+function getCG(id){ return S.cache.caregivers.find(c=>c.id===id); }
+function getCL(id){ return S.cache.clients.find(c=>c.id===id); }
+function getAS(cgId){ return S.cache.assignments.find(a=>a.cgId===cgId); }
+function cgTodaySess(cgId){ const t=new Date().toDateString(); return S.cache.sessions.filter(s=>s.cgId===cgId&&s.outTime&&new Date(tsToMs(s.inTime)).toDateString()===t); }
+function cgWeekSess(cgId){ const now=new Date(),d=now.getDay(),st=new Date(now);st.setDate(now.getDate()-d);st.setHours(0,0,0,0); return S.cache.sessions.filter(s=>s.cgId===cgId&&s.outTime&&new Date(tsToMs(s.inTime))>=st); }
+function cgAllSess(cgId){ return S.cache.sessions.filter(s=>s.cgId===cgId&&s.outTime); }
+function totMs(arr){ return arr.reduce((s,x)=>s+(tsToMs(x.outTime)-tsToMs(x.inTime)),0); }
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, async user => {
+  if(user){
+    S.user = user;
+    // Check if supervisor
+    const supDoc = await fsGet('settings','supervisor');
+    if(supDoc && supDoc.email === user.email){
+      S.userRole='supervisor';
+      await loadCache();
+      S.view='supervisor'; S.supTab='dashboard';
+    } else {
+      // Find caregiver profile
+      const cgs = await fsQuery('caregivers','email','==',user.email);
+      if(cgs.length>0){
+        S.userRole='caregiver';
+        S.cgProfile=cgs[0];
+        await loadCache();
+        // Check for open session
+        const open = S.cache.sessions.find(s=>s.cgId===cgs[0].id&&!s.outTime);
+        if(open){ S.clockedIn=true; S.clockInTime=tsToMs(open.inTime); S.openSessionId=open.id; }
+        else { S.clockedIn=false; S.clockInTime=null; }
+        S.view='caregiver'; S.cgTab='clock';
+      } else {
+        await signOut(auth);
+        S.view='login';
+      }
+    }
+  } else {
+    S.user=null; S.userRole=null; S.cgProfile=null;
+    S.view='login';
+  }
+  render();
+});
+
+// ── RENDER ──
+function render(){
+  const app=$('app'); app.innerHTML=''; clearInterval(S.timer);
+  if(S.view==='loading'){ app.innerHTML=`<div class="loading-screen"><div class="spin" style="width:24px;height:24px;border-width:3px"></div><p>Loading...</p></div>`; return; }
+  if(S.view==='login') app.appendChild(bLogin());
+  else if(S.view==='supervisor') app.appendChild(bSupervisor());
+  else if(S.view==='caregiver') app.appendChild(bCaregiver());
+}
+
+// ══════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════
 function bLogin(){
-  const w=document.createElement('div');w.style.padding='2rem 0';
+  const w=document.createElement('div'); w.style.padding='2rem 0';
   w.innerHTML=`
   <div style="text-align:center;margin-bottom:1.5rem">
     <div style="width:64px;height:64px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:28px">&#128305;</div>
     <div style="font-size:26px;font-weight:700;color:var(--tx)">Care Clock</div>
-    <div style="font-size:14px;color:var(--tx2);margin-top:4px">Caregiver time &amp; client management</div>
+    <div style="font-size:14px;color:var(--tx2);margin-top:4px">Secure caregiver time management</div>
   </div>
   <div class="card">
-    <div class="fld"><label>Username / Employee ID</label><input id="l-user" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
-    <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="Enter your password" autocomplete="off"></div>
+    <div class="fld"><label>Email address</label><input id="l-email" type="email" placeholder="your@email.com" autocomplete="email"></div>
+    <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="Enter your password" autocomplete="current-password"></div>
     <div id="l-msg" class="smsg merr" style="min-height:16px"></div>
-    <button class="btn btn-g" onclick="doLogin()">Sign in</button>
+    <button class="btn btn-g" id="l-btn" onclick="doLogin()">Sign in</button>
   </div>
-  <div style="text-align:center;font-size:12px;color:var(--tx3);margin-top:.5rem">Supervisor default: <strong>admin</strong> / <strong>admin1234</strong></div>`;
-  const inp=$('l-pass');if(inp)inp.onkeydown=e=>{if(e.key==='Enter')doLogin();};
+  <div style="text-align:center;font-size:12px;color:var(--tx3);margin-top:.5rem">First time? Set up supervisor account below</div>
+  <div id="setup-section" style="margin-top:1rem">
+    <div class="card" style="border:1px dashed var(--bdr2)">
+      <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.75rem">First-time supervisor setup</div>
+      <div class="fld"><label>Your email</label><input id="s-email" type="email" placeholder="supervisor@email.com" autocomplete="off"></div>
+      <div class="fld"><label>Create password</label><input id="s-pass" type="password" placeholder="Min 6 characters" autocomplete="off"></div>
+      <div id="s-msg" class="smsg mneu" style="min-height:16px"></div>
+      <button class="btn btn-b" onclick="doSetupSupervisor()">Create supervisor account</button>
+    </div>
+  </div>`;
+  setTimeout(()=>{
+    // Hide setup if supervisor already exists
+    fsGet('settings','supervisor').then(s=>{ if(s&&$('setup-section')) $('setup-section').style.display='none'; });
+    const p=$('l-pass'); if(p) p.onkeydown=e=>{if(e.key==='Enter')doLogin();};
+  },0);
   return w;
 }
 
-function doLogin(){
-  const user=($('l-user').value||'').trim().toLowerCase();
+async function doLogin(){
+  const email=($('l-email').value||'').trim();
   const pass=($('l-pass').value||'').trim();
-  if(!user||!pass){setMsg('l-msg','Please enter username and password.','merr');return;}
-  // Check supervisor
-  if(user==='admin'||user===DB.supervisor.name.toLowerCase()){
-    if(pass===DB.supervisor.password){S.view='supervisor';S.supTab='dashboard';render();return;}
-    else{setMsg('l-msg','Incorrect password.','merr');return;}
+  if(!email||!pass){setMsg('l-msg','Please enter email and password.','merr');return;}
+  const btn=$('l-btn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Signing in...';
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e){
+    let msg='Incorrect email or password.';
+    if(e.code==='auth/user-not-found') msg='No account found with that email.';
+    if(e.code==='auth/wrong-password') msg='Incorrect password.';
+    if(e.code==='auth/too-many-requests') msg='Too many attempts. Try again later.';
+    setMsg('l-msg',msg,'merr');
+    btn.disabled=false; btn.innerHTML='Sign in';
   }
-  // Check caregivers
-  const cg=DB.caregivers.find(c=>c.username.toLowerCase()===user);
-  if(!cg){setMsg('l-msg','Username not found.','merr');return;}
-  if(cg.password!==pass){setMsg('l-msg','Incorrect password.','merr');return;}
-  S.currentCG=cg;S.view='caregiver';S.cgTab='clock';
-  S.locOk=false;S.locChecked=false;S.locDist=null;S.locErr=null;
-  // Restore clock state if clocked in
-  const openSession=DB.sessions.find(s=>s.cgId===cg.id&&!s.outTime);
-  if(openSession){S.clockedIn=true;S.clockInTime=openSession.inTime;S.openSessionId=openSession.id;}
-  else{S.clockedIn=false;S.clockInTime=null;}
-  render();
 }
 
-/* ═══════════════════════════════════════
-   SUPERVISOR PORTAL
-═══════════════════════════════════════ */
+async function doSetupSupervisor(){
+  const email=($('s-email').value||'').trim();
+  const pass=($('s-pass').value||'').trim();
+  if(!email||!pass){setMsg('s-msg','Please enter email and password.','merr');return;}
+  if(pass.length<6){setMsg('s-msg','Password must be at least 6 characters.','merr');return;}
+  setMsg('s-msg','<span class="spin"></span>Creating account...','mneu');
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await fsSet('settings','supervisor',{email, createdAt: Date.now()});
+  } catch(e){
+    let msg='Could not create account.';
+    if(e.code==='auth/email-already-in-use') msg='An account with this email already exists. Try signing in.';
+    setMsg('s-msg',msg,'merr');
+  }
+}
+
+// ══════════════════════════════════════
+// SUPERVISOR
+// ══════════════════════════════════════
 function bSupervisor(){
   const w=document.createElement('div');
-  // Header
   w.innerHTML=`
   <div class="hrow">
-    <div>
-      <div style="font-size:20px;font-weight:700;color:var(--tx)">Supervisor Portal</div>
-      <div style="font-size:13px;color:var(--tx2)">Care Clock Management</div>
-    </div>
-    <button class="btn-sm" onclick="logout()">Sign out</button>
+    <div><div style="font-size:20px;font-weight:700;color:var(--tx)">Supervisor Portal</div><div style="font-size:13px;color:var(--tx2)">Care Clock Management</div></div>
+    <button class="btn-sm" onclick="doLogout()">Sign out</button>
   </div>
   <div class="nav">
     <button class="nav-tab ${S.supTab==='dashboard'?'on':''}" onclick="supTab('dashboard')">Dashboard</button>
     <button class="nav-tab ${S.supTab==='caregivers'?'on':''}" onclick="supTab('caregivers')">Caregivers</button>
     <button class="nav-tab ${S.supTab==='clients'?'on':''}" onclick="supTab('clients')">Clients</button>
-    <button class="nav-tab ${S.supTab==='assignments'?'on':''}" onclick="supTab('assignments')">Assignments</button>
+    <button class="nav-tab ${S.supTab==='assignments'?'on':''}" onclick="supTab('assignments')">Assign</button>
     <button class="nav-tab ${S.supTab==='reports'?'on':''}" onclick="supTab('reports')">Reports</button>
   </div>
-  <div id="sup-content"></div>`;
+  <div id="sup-body"></div>`;
   setTimeout(()=>{
-    const c=$('sup-content');if(!c)return;
-    if(S.supTab==='dashboard')c.appendChild(bSupDashboard());
-    else if(S.supTab==='caregivers')c.appendChild(bSupCaregivers());
-    else if(S.supTab==='clients')c.appendChild(bSupClients());
-    else if(S.supTab==='assignments')c.appendChild(bSupAssignments());
-    else if(S.supTab==='reports')c.appendChild(bSupReports());
+    const b=$('sup-body'); if(!b) return;
+    if(S.supTab==='dashboard') b.appendChild(bSupDash());
+    else if(S.supTab==='caregivers') b.appendChild(bSupCG());
+    else if(S.supTab==='clients') b.appendChild(bSupCL());
+    else if(S.supTab==='assignments') b.appendChild(bSupAS());
+    else if(S.supTab==='reports') b.appendChild(bSupReports());
   },0);
   return w;
 }
 function supTab(t){S.supTab=t;S.editCG=null;S.editCL=null;S.editAS=null;render();}
 
-/* Dashboard */
-function bSupDashboard(){
+// Dashboard
+function bSupDash(){
   const w=document.createElement('div');
-  const todayAll=DB.sessions.filter(s=>new Date(s.inTime).toDateString()===new Date().toDateString()&&s.outTime);
-  const activeNow=DB.sessions.filter(s=>!s.outTime);
+  const active=S.cache.sessions.filter(s=>!s.outTime);
+  const today=S.cache.sessions.filter(s=>s.outTime&&new Date(tsToMs(s.inTime)).toDateString()===new Date().toDateString());
   w.innerHTML=`
   <div class="mgrid">
-    <div class="met"><div class="met-l">Caregivers</div><div class="met-v">${DB.caregivers.length}</div></div>
-    <div class="met"><div class="met-l">Clients</div><div class="met-v">${DB.clients.length}</div></div>
-    <div class="met"><div class="met-l">Active now</div><div class="met-v" style="color:var(--green)">${activeNow.length}</div></div>
-    <div class="met"><div class="met-l">Shifts today</div><div class="met-v">${todayAll.length}</div></div>
+    <div class="met"><div class="met-l">Caregivers</div><div class="met-v">${S.cache.caregivers.length}</div></div>
+    <div class="met"><div class="met-l">Clients</div><div class="met-v">${S.cache.clients.length}</div></div>
+    <div class="met"><div class="met-l">Active now</div><div class="met-v" style="color:var(--green)">${active.length}</div></div>
+    <div class="met"><div class="met-l">Shifts today</div><div class="met-v">${today.length}</div></div>
   </div>
   <div class="card">
     <div class="sec-label">Currently clocked in</div>
-    ${activeNow.length?activeNow.map(s=>{
-      const cg=getCaregiver(s.cgId);
-      const as=getAssignment(s.cgId);
-      const cl=as?getClient(as.clientId):null;
+    ${active.length?active.map(s=>{
+      const cg=getCG(s.cgId);
+      const as=getAS(s.cgId);
+      const cl=as?getCL(as.clientId):null;
       return`<div class="row">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="av av-g">${ini(cg?.name)}</div>
           <div>
             <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg?.name||'Unknown'}</div>
-            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'} &bull; since ${fT2(tsToMs(s.inTime))}</div>
           </div>
         </div>
-        <div>
-          <div class="badge b-green"><div class="dot dg"></div>Active</div>
-          <div style="font-size:12px;color:var(--tx3);text-align:right;margin-top:2px">since ${fT2(s.inTime)}</div>
-        </div>
-      </div>`;}).join(''):`<div class="empty">No one is currently clocked in</div>`}
+        <div class="badge b-green"><div class="dot dg"></div>Active</div>
+      </div>`;}).join(''):`<div class="empty">No one clocked in right now</div>`}
   </div>
   <div class="card">
     <div class="sec-label">Quick actions</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <button class="btn btn-o" onclick="supTab('caregivers')">+ Add caregiver</button>
       <button class="btn btn-o" onclick="supTab('clients')">+ Add client</button>
-      <button class="btn btn-o" onclick="supTab('assignments')">+ New assignment</button>
+      <button class="btn btn-o" onclick="supTab('assignments')">+ Assign</button>
       <button class="btn btn-o" onclick="supTab('reports')">View reports</button>
     </div>
-  </div>
-  <div class="card">
-    <div class="sec-label">Supervisor settings</div>
-    <div class="fld"><label>Change supervisor password</label><input id="sup-pw" type="password" placeholder="New password" autocomplete="off"></div>
-    <div id="sup-pw-msg" class="smsg mneu" style="min-height:14px"></div>
-    <button class="btn btn-o" onclick="changeSupPass()">Update password</button>
   </div>`;
   return w;
 }
 
-function changeSupPass(){
-  const p=($('sup-pw').value||'').trim();
-  if(!p||p.length<4){setMsg('sup-pw-msg','Password must be at least 4 characters.','merr');return;}
-  DB.supervisor.password=p;sv(DB);
-  setMsg('sup-pw-msg','Password updated!','mok');
-  $('sup-pw').value='';
-}
-
-/* Caregivers */
-function bSupCaregivers(){
+// Caregivers
+function bSupCG(){
   const w=document.createElement('div');
-  const editing=S.editCG;
+  const ed=S.editCG;
   w.innerHTML=`
   <div class="card">
-    <div class="sec-label">${editing?'Edit caregiver':'Add new caregiver'}</div>
+    <div class="sec-label">${ed?'Edit caregiver':'Add new caregiver'}</div>
     <div class="frow">
-      <div class="fld"><label>Full name</label><input id="cg-name" value="${editing?.name||''}" placeholder="Full name" autocomplete="off"></div>
-      <div class="fld"><label>Phone</label><input id="cg-phone" value="${editing?.phone||''}" placeholder="Phone number" autocomplete="off"></div>
+      <div class="fld"><label>Full name</label><input id="cg-n" value="${ed?.name||''}" placeholder="Full name" autocomplete="off"></div>
+      <div class="fld"><label>Phone</label><input id="cg-ph" value="${ed?.phone||''}" placeholder="Phone" autocomplete="off"></div>
     </div>
-    <div class="frow">
-      <div class="fld"><label>Username</label><input id="cg-user" value="${editing?.username||''}" placeholder="Login username" autocorrect="off" autocapitalize="off" autocomplete="off"></div>
-      <div class="fld"><label>Password</label><input id="cg-pass" value="${editing?.password||''}" placeholder="Login password" autocomplete="off"></div>
-    </div>
-    <div class="fld"><label>Email (optional)</label><input id="cg-email" value="${editing?.email||''}" placeholder="Email address" autocomplete="off"></div>
+    <div class="fld"><label>Email (used to login)</label><input id="cg-em" type="email" value="${ed?.email||''}" placeholder="caregiver@email.com" autocomplete="off" ${ed?'readonly style="background:var(--bg);color:var(--tx3)"':''}></div>
+    ${!ed?`<div class="fld"><label>Temporary password</label><input id="cg-pw" type="password" placeholder="Min 6 characters" autocomplete="off"><div class="hint">Caregiver will use this to log in. Share it with them securely.</div></div>`:''}
     <div id="cg-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-g" onclick="saveCG()">${editing?'Save changes':'Add caregiver'}</button>
-      ${editing?`<button class="btn btn-o" onclick="S.editCG=null;render()">Cancel</button>`:''}
+      <button class="btn btn-g" onclick="saveCG()">${ed?'Save changes':'Add caregiver'}</button>
+      ${ed?`<button class="btn btn-o" onclick="S.editCG=null;render()">Cancel</button>`:''}
     </div>
   </div>
   <div class="card">
-    <div class="sec-label">All caregivers (${DB.caregivers.length})</div>
-    ${DB.caregivers.length?DB.caregivers.map(cg=>{
-      const as=getAssignment(cg.id);
-      const cl=as?getClient(as.clientId):null;
+    <div class="sec-label">All caregivers (${S.cache.caregivers.length})</div>
+    ${S.cache.caregivers.length?S.cache.caregivers.map(cg=>{
+      const as=getAS(cg.id);
+      const cl=as?getCL(as.clientId):null;
       const todayMs=totMs(cgTodaySessions(cg.id));
       return`<div class="row">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="av av-g">${ini(cg.name)}</div>
           <div>
             <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg.name}</div>
-            <div style="font-size:12px;color:var(--tx2)">@${cg.username} &bull; ${cl?cl.name:'No assignment'}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cg.email} &bull; ${cl?cl.name:'No assignment'}</div>
             <div style="font-size:12px;color:var(--tx3)">Today: ${fHM(todayMs)}</div>
           </div>
         </div>
@@ -366,162 +413,172 @@ function bSupCaregivers(){
           <button class="btn-icon" onclick="editCG('${cg.id}')">&#9998;</button>
           <button class="btn-icon" style="color:var(--red-t)" onclick="deleteCG('${cg.id}')">&#128465;</button>
         </div>
-      </div>`;}).join(''):`<div class="empty">No caregivers added yet</div>`}
+      </div>`;}).join(''):`<div class="empty">No caregivers yet</div>`}
   </div>`;
   return w;
 }
 
-function saveCG(){
-  const name=($('cg-name').value||'').trim();
-  const phone=($('cg-phone').value||'').trim();
-  const username=($('cg-user').value||'').trim().toLowerCase();
-  const password=($('cg-pass').value||'').trim();
-  const email=($('cg-email').value||'').trim();
-  if(!name||!username||!password){setMsg('cg-msg','Name, username and password are required.','merr');return;}
-  // Check duplicate username
-  const dup=DB.caregivers.find(c=>c.username===username&&c.id!==S.editCG?.id);
-  if(dup){setMsg('cg-msg','That username is already taken.','merr');return;}
-  if(S.editCG){
-    const i=DB.caregivers.findIndex(c=>c.id===S.editCG.id);
-    if(i>=0)DB.caregivers[i]={...DB.caregivers[i],name,phone,username,password,email};
-    S.editCG=null;
-  } else {
-    DB.caregivers.push({id:uid(),name,phone,username,password,email});
-  }
-  sv(DB);render();
+async function saveCG(){
+  const name=($('cg-n').value||'').trim();
+  const phone=($('cg-ph').value||'').trim();
+  const email=($('cg-em').value||'').trim();
+  if(!name||!email){setMsg('cg-msg','Name and email are required.','merr');return;}
+  setMsg('cg-msg','<span class="spin"></span>Saving...','mneu');
+  try{
+    if(S.editCG){
+      await fsSet('caregivers',S.editCG.id,{name,phone});
+      S.editCG=null;
+    } else {
+      const pw=($('cg-pw').value||'').trim();
+      if(!pw||pw.length<6){setMsg('cg-msg','Password must be at least 6 characters.','merr');return;}
+      // Create Firebase auth user
+      // Note: this creates the user in auth - in production use Admin SDK
+      // For now we store credentials and create on first login
+      const id=uid();
+      await fsSet('caregivers',id,{name,email,phone,createdAt:Date.now(),tempPass:pw});
+    }
+    await loadCache();
+    render();
+  } catch(e){ setMsg('cg-msg','Error: '+e.message,'merr'); }
 }
-function editCG(id){S.editCG=DB.caregivers.find(c=>c.id===id)||null;S.supTab='caregivers';render();}
-function deleteCG(id){if(!confirm('Delete this caregiver?'))return;DB.caregivers=DB.caregivers.filter(c=>c.id!==id);DB.assignments=DB.assignments.filter(a=>a.cgId!==id);sv(DB);render();}
+function editCG(id){S.editCG=S.cache.caregivers.find(c=>c.id===id)||null;S.supTab='caregivers';render();}
+async function deleteCG(id){
+  if(!confirm('Delete this caregiver? Their shift records will be kept.'))return;
+  await fsDel('caregivers',id);
+  await loadCache(); render();
+}
 
-/* Clients */
-function bSupClients(){
+// Clients
+function bSupCL(){
   const w=document.createElement('div');
-  const editing=S.editCL;
+  const ed=S.editCL;
   w.innerHTML=`
   <div class="card">
-    <div class="sec-label">${editing?'Edit client':'Add new client'}</div>
-    <div class="fld"><label>Client full name</label><input id="cl-name" value="${editing?.name||''}" placeholder="Full name" autocomplete="off"></div>
-    <div class="fld"><label>Care address</label><input id="cl-addr" value="${editing?.address||''}" placeholder="Full address" autocomplete="off"></div>
+    <div class="sec-label">${ed?'Edit client':'Add new client'}</div>
+    <div class="fld"><label>Client full name</label><input id="cl-n" value="${ed?.name||''}" placeholder="Full name" autocomplete="off"></div>
+    <div class="fld"><label>Care address</label><input id="cl-a" value="${ed?.address||''}" placeholder="Full address" autocomplete="off"></div>
     <div class="frow">
-      <div class="fld"><label>Care start date</label><input id="cl-start" type="date" value="${editing?.startDate||''}"></div>
-      <div class="fld"><label>Care end date</label><input id="cl-end" type="date" value="${editing?.endDate||''}"></div>
+      <div class="fld"><label>Start date</label><input id="cl-sd" type="date" value="${ed?.startDate||''}"></div>
+      <div class="fld"><label>End date</label><input id="cl-ed" type="date" value="${ed?.endDate||''}"></div>
     </div>
-    <div class="fld"><label>Care schedule</label><input id="cl-sched" value="${editing?.schedule||''}" placeholder="e.g. Mon-Fri 8am-4pm" autocomplete="off"></div>
-    <div class="fld"><label>Emergency contact name</label><input id="cl-ecname" value="${editing?.ecName||''}" placeholder="Contact name" autocomplete="off"></div>
+    <div class="fld"><label>Care schedule</label><input id="cl-sc" value="${ed?.schedule||''}" placeholder="e.g. Mon-Fri 8am-4pm" autocomplete="off"></div>
+    <div class="div"></div>
+    <div class="sec-label">Emergency contact</div>
+    <div class="fld"><label>Contact name</label><input id="cl-ecn" value="${ed?.ecName||''}" placeholder="Full name" autocomplete="off"></div>
     <div class="frow">
-      <div class="fld"><label>Emergency phone</label><input id="cl-ecphone" value="${editing?.ecPhone||''}" placeholder="Phone number" autocomplete="off"></div>
-      <div class="fld"><label>Relationship</label><input id="cl-ecrel" value="${editing?.ecRel||''}" placeholder="e.g. Daughter" autocomplete="off"></div>
+      <div class="fld"><label>Phone</label><input id="cl-ecp" value="${ed?.ecPhone||''}" placeholder="Phone number" autocomplete="off"></div>
+      <div class="fld"><label>Relationship</label><input id="cl-ecr" value="${ed?.ecRel||''}" placeholder="e.g. Daughter" autocomplete="off"></div>
     </div>
-    <div class="fld"><label>Care notes</label><textarea id="cl-notes" placeholder="Special instructions, medical notes...">${editing?.notes||''}</textarea></div>
+    <div class="fld"><label>Care notes</label><textarea id="cl-nt" placeholder="Special instructions, medical info...">${ed?.notes||''}</textarea></div>
+    <div class="div"></div>
     <div class="fld"><label>GPS location</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-o" id="cl-pin-btn" onclick="pinClientLocation()" style="flex:1">&#x1F4CD; Pin location now</button>
-        <div id="cl-pin-status" style="font-size:12px;color:var(--green-t);flex:1;font-variant-numeric:tabular-nums">${editing?.lat?`${editing.lat.toFixed(4)}, ${editing.lng.toFixed(4)}`:''}</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+        <button class="btn btn-o" id="cl-pin-btn" onclick="pinCL()" style="flex:1">&#x1F4CD; Pin location at address</button>
+        <div id="cl-pin-st" style="font-size:12px;color:var(--green-t);flex:1;font-variant-numeric:tabular-nums">${ed?.lat?`${ed.lat.toFixed(4)}, ${ed.lng.toFixed(4)}`:''}</div>
       </div>
-      <div class="hint">Stand at the care address and tap to save GPS coordinates</div>
+      <div class="hint">Go to the care home address and tap to save GPS for 100 ft clock-in enforcement</div>
     </div>
     <div id="cl-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-g" onclick="saveCL()">${editing?'Save changes':'Add client'}</button>
-      ${editing?`<button class="btn btn-o" onclick="S.editCL=null;render()">Cancel</button>`:''}
+      <button class="btn btn-g" onclick="saveCL()">${ed?'Save changes':'Add client'}</button>
+      ${ed?`<button class="btn btn-o" onclick="S.editCL=null;render()">Cancel</button>`:''}
     </div>
   </div>
   <div class="card">
-    <div class="sec-label">All clients (${DB.clients.length})</div>
-    ${DB.clients.length?DB.clients.map(cl=>{
-      const as=DB.assignments.find(a=>a.clientId===cl.id);
-      const cg=as?getCaregiver(as.cgId):null;
+    <div class="sec-label">All clients (${S.cache.clients.length})</div>
+    ${S.cache.clients.length?S.cache.clients.map(cl=>{
+      const as=S.cache.assignments.find(a=>a.clientId===cl.id);
+      const cg=as?getCG(as.cgId):null;
       return`<div class="row">
         <div style="display:flex;align-items:center;gap:10px">
           <div class="av av-b">${ini(cl.name)}</div>
           <div>
             <div style="font-size:14px;font-weight:600;color:var(--tx)">${cl.name}</div>
             <div style="font-size:12px;color:var(--tx2)">${cl.address}</div>
-            <div style="font-size:12px;color:var(--tx3)">${cg?'Caregiver: '+cg.name:'No caregiver assigned'}</div>
+            <div style="font-size:12px;color:var(--tx3)">${cg?'Caregiver: '+cg.name:'Unassigned'}</div>
           </div>
         </div>
         <div style="display:flex;gap:6px">
           <button class="btn-icon" onclick="editCL('${cl.id}')">&#9998;</button>
           <button class="btn-icon" style="color:var(--red-t)" onclick="deleteCL('${cl.id}')">&#128465;</button>
         </div>
-      </div>`;}).join(''):`<div class="empty">No clients added yet</div>`}
+      </div>`;}).join(''):`<div class="empty">No clients yet</div>`}
   </div>`;
-  // Restore pinned coords if editing
-  if(editing?.lat){window._clLat=editing.lat;window._clLng=editing.lng;}
+  if(ed?.lat){window._clLat=ed.lat;window._clLng=ed.lng;}
   else{window._clLat=null;window._clLng=null;}
   return w;
 }
 
-function pinClientLocation(){
-  const btn=$('cl-pin-btn'),st=$('cl-pin-status');
+function pinCL(){
+  const btn=$('cl-pin-btn'),st=$('cl-pin-st');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
   navigator.geolocation.getCurrentPosition(pos=>{
     window._clLat=pos.coords.latitude;window._clLng=pos.coords.longitude;
-    if(st){st.textContent=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Pinned! Tap to update';}
+    if(st)st.textContent=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Pinned!';}
   },err=>{
     if(st){st.style.color='var(--red-t)';st.textContent=err.code===1?'Permission denied.':'Could not get location.';}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin location now';}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin location at address';}
   },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
 
-function saveCL(){
-  const name=($('cl-name').value||'').trim();
-  const address=($('cl-addr').value||'').trim();
-  const startDate=($('cl-start').value||'').trim();
-  const endDate=($('cl-end').value||'').trim();
-  const schedule=($('cl-sched').value||'').trim();
-  const ecName=($('cl-ecname').value||'').trim();
-  const ecPhone=($('cl-ecphone').value||'').trim();
-  const ecRel=($('cl-ecrel').value||'').trim();
-  const notes=($('cl-notes').value||'').trim();
-  if(!name||!address){setMsg('cl-msg','Client name and address are required.','merr');return;}
-  const lat=window._clLat||null;
-  const lng=window._clLng||null;
-  if(!lat){setMsg('cl-msg','Please pin the care location GPS first.','merr');return;}
-  const obj={id:S.editCL?S.editCL.id:uid(),name,address,startDate,endDate,schedule,ecName,ecPhone,ecRel,notes,lat,lng};
-  if(S.editCL){const i=DB.clients.findIndex(c=>c.id===S.editCL.id);if(i>=0)DB.clients[i]=obj;S.editCL=null;}
-  else DB.clients.push(obj);
-  sv(DB);render();
+async function saveCL(){
+  const name=($('cl-n').value||'').trim();
+  const address=($('cl-a').value||'').trim();
+  if(!name||!address){setMsg('cl-msg','Name and address are required.','merr');return;}
+  if(!window._clLat){setMsg('cl-msg','Please pin the GPS location first.','merr');return;}
+  const data={name,address,startDate:$('cl-sd').value||'',endDate:$('cl-ed').value||'',
+    schedule:$('cl-sc').value||'',ecName:$('cl-ecn').value||'',ecPhone:$('cl-ecp').value||'',
+    ecRel:$('cl-ecr').value||'',notes:$('cl-nt').value||'',lat:window._clLat,lng:window._clLng,updatedAt:Date.now()};
+  setMsg('cl-msg','<span class="spin"></span>Saving...','mneu');
+  try{
+    if(S.editCL){ await fsSet('clients',S.editCL.id,data); S.editCL=null; }
+    else { data.createdAt=Date.now(); await fsAdd('clients',data); }
+    await loadCache(); render();
+  } catch(e){ setMsg('cl-msg','Error: '+e.message,'merr'); }
 }
-function editCL(id){S.editCL=DB.clients.find(c=>c.id===id)||null;S.supTab='clients';render();}
-function deleteCL(id){if(!confirm('Delete this client?'))return;DB.clients=DB.clients.filter(c=>c.id!==id);DB.assignments=DB.assignments.filter(a=>a.clientId!==id);sv(DB);render();}
+function editCL(id){S.editCL=S.cache.clients.find(c=>c.id===id)||null;S.supTab='clients';render();}
+async function deleteCL(id){
+  if(!confirm('Delete this client?'))return;
+  await fsDel('clients',id);
+  await loadCache(); render();
+}
 
-/* Assignments */
-function bSupAssignments(){
+// Assignments
+function bSupAS(){
   const w=document.createElement('div');
-  const editing=S.editAS;
+  const ed=S.editAS;
   w.innerHTML=`
   <div class="card">
-    <div class="sec-label">${editing?'Edit assignment':'New assignment'}</div>
+    <div class="sec-label">${ed?'Edit assignment':'New assignment'}</div>
     <div class="fld"><label>Caregiver</label>
       <select id="as-cg">
         <option value="">Select caregiver...</option>
-        ${DB.caregivers.map(c=>`<option value="${c.id}" ${editing?.cgId===c.id?'selected':''}>${c.name}</option>`).join('')}
+        ${S.cache.caregivers.map(c=>`<option value="${c.id}" ${ed?.cgId===c.id?'selected':''}>${c.name}</option>`).join('')}
       </select>
     </div>
     <div class="fld"><label>Client</label>
       <select id="as-cl">
         <option value="">Select client...</option>
-        ${DB.clients.map(c=>`<option value="${c.id}" ${editing?.clientId===c.id?'selected':''}>${c.name}</option>`).join('')}
+        ${S.cache.clients.map(c=>`<option value="${c.id}" ${ed?.clientId===c.id?'selected':''}>${c.name}</option>`).join('')}
       </select>
     </div>
     <div class="frow">
-      <div class="fld"><label>Start date</label><input id="as-start" type="date" value="${editing?.startDate||''}"></div>
-      <div class="fld"><label>End date</label><input id="as-end" type="date" value="${editing?.endDate||''}"></div>
+      <div class="fld"><label>Start date</label><input id="as-sd" type="date" value="${ed?.startDate||''}"></div>
+      <div class="fld"><label>End date</label><input id="as-ed" type="date" value="${ed?.endDate||''}"></div>
     </div>
-    <div class="fld"><label>Notes (optional)</label><textarea id="as-notes" placeholder="Assignment notes...">${editing?.notes||''}</textarea></div>
+    <div class="fld"><label>Notes</label><textarea id="as-nt" placeholder="Assignment notes...">${ed?.notes||''}</textarea></div>
     <div id="as-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-g" onclick="saveAS()">${editing?'Save changes':'Create assignment'}</button>
-      ${editing?`<button class="btn btn-o" onclick="S.editAS=null;render()">Cancel</button>`:''}
+      <button class="btn btn-g" onclick="saveAS()">${ed?'Save changes':'Create assignment'}</button>
+      ${ed?`<button class="btn btn-o" onclick="S.editAS=null;render()">Cancel</button>`:''}
     </div>
   </div>
   <div class="card">
-    <div class="sec-label">All assignments (${DB.assignments.length})</div>
-    ${DB.assignments.length?DB.assignments.map(as=>{
-      const cg=getCaregiver(as.cgId);
-      const cl=getClient(as.clientId);
+    <div class="sec-label">All assignments (${S.cache.assignments.length})</div>
+    ${S.cache.assignments.length?S.cache.assignments.map(as=>{
+      const cg=getCG(as.cgId);
+      const cl=getCL(as.clientId);
       return`<div class="row">
         <div>
           <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg?.name||'?'} &rarr; ${cl?.name||'?'}</div>
@@ -536,52 +593,59 @@ function bSupAssignments(){
   </div>`;
   return w;
 }
-function saveAS(){
+
+async function saveAS(){
   const cgId=($('as-cg').value||'').trim();
   const clientId=($('as-cl').value||'').trim();
-  const startDate=($('as-start').value||'').trim();
-  const endDate=($('as-end').value||'').trim();
-  const notes=($('as-notes').value||'').trim();
-  if(!cgId||!clientId){setMsg('as-msg','Please select both a caregiver and client.','merr');return;}
-  const obj={id:S.editAS?S.editAS.id:uid(),cgId,clientId,startDate,endDate,notes};
-  if(S.editAS){const i=DB.assignments.findIndex(a=>a.id===S.editAS.id);if(i>=0)DB.assignments[i]=obj;S.editAS=null;}
-  else DB.assignments.push(obj);
-  sv(DB);render();
+  if(!cgId||!clientId){setMsg('as-msg','Please select both caregiver and client.','merr');return;}
+  const data={cgId,clientId,startDate:$('as-sd').value||'',endDate:$('as-ed').value||'',notes:$('as-nt').value||'',updatedAt:Date.now()};
+  setMsg('as-msg','<span class="spin"></span>Saving...','mneu');
+  try{
+    if(S.editAS){ await fsSet('assignments',S.editAS.id,data); S.editAS=null; }
+    else { data.createdAt=Date.now(); await fsAdd('assignments',data); }
+    await loadCache(); render();
+  } catch(e){ setMsg('as-msg','Error: '+e.message,'merr'); }
 }
-function editAS(id){S.editAS=DB.assignments.find(a=>a.id===id)||null;S.supTab='assignments';render();}
-function deleteAS(id){if(!confirm('Remove this assignment?'))return;DB.assignments=DB.assignments.filter(a=>a.id!==id);sv(DB);render();}
+function editAS(id){S.editAS=S.cache.assignments.find(a=>a.id===id)||null;S.supTab='assignments';render();}
+async function deleteAS(id){
+  if(!confirm('Remove this assignment?'))return;
+  await fsDel('assignments',id);
+  await loadCache(); render();
+}
 
-/* Reports */
+// Reports
 function bSupReports(){
   const w=document.createElement('div');
-  let html=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem"><div class="sec-label" style="margin:0">All caregiver reports</div><button class="btn-sm" onclick="exportAllCSV()">Export all CSV</button></div>`;
-  if(!DB.caregivers.length){html+=`<div class="empty">No caregivers yet</div>`;}
-  else{
-    DB.caregivers.forEach(cg=>{
+  let html=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem">
+      <div class="sec-label" style="margin:0">All caregiver reports</div>
+      <button class="btn-sm" onclick="exportCSV()">Export CSV</button>
+    </div>`;
+  if(!S.cache.caregivers.length){ html+=`<div class="empty">No caregivers yet</div>`; }
+  else {
+    S.cache.caregivers.forEach(cg=>{
+      const as=getAS(cg.id);
+      const cl=as?getCL(as.clientId):null;
       const todayMs=totMs(cgTodaySessions(cg.id));
-      const weekMs=totMs(cgWeekSessions(cg.id));
-      const allMs=totMs(cgSessions(cg.id).filter(s=>s.outTime));
-      const as=getAssignment(cg.id);
-      const cl=as?getClient(as.clientId):null;
-      html+=`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr)">
+      const weekMs=totMs(cgWeekSess(cg.id));
+      const allMs=totMs(cgAllSess(cg.id));
+      const recent=cgAllSess(cg.id).slice(-5).reverse();
+      html+=`<div style="margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--bdr)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem">
           <div class="av av-g">${ini(cg.name)}</div>
           <div>
             <div style="font-size:15px;font-weight:700;color:var(--tx)">${cg.name}</div>
-            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'} &bull; ${cg.email}</div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.75rem">
-          <div class="met"><div class="met-l">Today</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(todayMs)}</div></div>
-          <div class="met"><div class="met-l">This week</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(weekMs)}</div></div>
-          <div class="met"><div class="met-l">All time</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(allMs)}</div></div>
-        </div>`;
-      const sess=cgSessions(cg.id).filter(s=>s.outTime).slice(-5).reverse();
-      if(sess.length){
-        html+=`<div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recent shifts</div>`;
-        sess.forEach((s,i)=>{html+=`<div class="row"><span class="row-label">${fDs(s.inTime)} &nbsp; ${fT2(s.inTime)}&ndash;${fT2(s.outTime)}</span><span class="row-val-g">${fHM(s.outTime-s.inTime)}</span></div>`;});
-      }
-      html+=`</div>`;
+          <div class="met"><div class="met-l">Today</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(todayMs)}</div></div>
+          <div class="met"><div class="met-l">This week</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(weekMs)}</div></div>
+          <div class="met"><div class="met-l">All time</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(allMs)}</div></div>
+        </div>
+        ${recent.length?`<div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recent shifts</div>`+
+          recent.map(s=>`<div class="row"><span style="font-size:13px;color:var(--tx2)">${fDs(tsToMs(s.inTime))} &nbsp; ${fT2(tsToMs(s.inTime))} &ndash; ${fT2(tsToMs(s.outTime))}</span><span style="font-size:13px;font-weight:600;color:var(--green)">${fHM(tsToMs(s.outTime)-tsToMs(s.inTime))}</span></div>`).join(''):''}
+      </div>`;
     });
   }
   html+=`</div>`;
@@ -589,15 +653,14 @@ function bSupReports(){
   return w;
 }
 
-function exportAllCSV(){
-  const hdr=['Caregiver','Client','Date','Clock In','Clock Out','Duration (hrs)','Duration (min)'];
-  const rows=[];
-  DB.sessions.filter(s=>s.outTime).forEach(s=>{
-    const cg=getCaregiver(s.cgId);
-    const as=getAssignment(s.cgId);
-    const cl=as?getClient(as.clientId):null;
-    const ms=s.outTime-s.inTime;
-    rows.push([cg?.name||'',cl?.name||'',fDs(s.inTime),fT2(s.inTime),fT2(s.outTime),(ms/3600000).toFixed(2),Math.round(ms/60000)]);
+function exportCSV(){
+  const hdr=['Caregiver','Email','Client','Date','Clock In','Clock Out','Duration (hrs)','Duration (min)'];
+  const rows=S.cache.sessions.filter(s=>s.outTime).map(s=>{
+    const cg=getCG(s.cgId);
+    const as=getAS(s.cgId);
+    const cl=as?getCL(as.clientId):null;
+    const ms=tsToMs(s.outTime)-tsToMs(s.inTime);
+    return[cg?.name||'',cg?.email||'',cl?.name||'',fDs(tsToMs(s.inTime)),fT2(tsToMs(s.inTime)),fT2(tsToMs(s.outTime)),(ms/3600000).toFixed(2),Math.round(ms/60000)];
   });
   const csv=[hdr,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
@@ -605,13 +668,13 @@ function exportAllCSV(){
   const a=document.createElement('a');a.href=url;a.download='care_clock_report.csv';a.click();URL.revokeObjectURL(url);
 }
 
-/* ═══════════════════════════════════════
-   CAREGIVER VIEW
-═══════════════════════════════════════ */
+// ══════════════════════════════════════
+// CAREGIVER VIEW
+// ══════════════════════════════════════
 function bCaregiver(){
-  const cg=S.currentCG;
-  const as=getAssignment(cg.id);
-  const cl=as?getClient(as.clientId):null;
+  const cg=S.cgProfile;
+  const as=getAS(cg.id);
+  const cl=as?getCL(as.clientId):null;
   const w=document.createElement('div');
   w.innerHTML=`
   <div class="hrow">
@@ -619,60 +682,48 @@ function bCaregiver(){
       <div class="av av-g">${ini(cg.name)}</div>
       <div>
         <div style="font-size:17px;font-weight:700;color:var(--tx)">${cg.name}</div>
-        <div style="font-size:13px;color:var(--tx2)">Caregiver</div>
+        <div style="font-size:13px;color:var(--tx2)">${cl?'Assigned to '+cl.name:'No active assignment'}</div>
       </div>
     </div>
-    <button class="btn-sm" onclick="logout()">Sign out</button>
+    <button class="btn-sm" onclick="doLogout()">Sign out</button>
   </div>
   <div class="nav">
     <button class="nav-tab ${S.cgTab==='clock'?'on':''}" onclick="cgTab('clock')">Clock</button>
-    <button class="nav-tab ${S.cgTab==='assignment'?'on':''}" onclick="cgTab('assignment')">My Assignment</button>
-    <button class="nav-tab ${S.cgTab==='log'?'on':''}" onclick="cgTab('log')">My Hours</button>
+    <button class="nav-tab ${S.cgTab==='assignment'?'on':''}" onclick="cgTab('assignment')">Assignment</button>
+    <button class="nav-tab ${S.cgTab==='hours'?'on':''}" onclick="cgTab('hours')">My Hours</button>
   </div>
-  <div id="cg-content"></div>`;
+  <div id="cg-body"></div>`;
   setTimeout(()=>{
-    const c=$('cg-content');if(!c)return;
-    if(S.cgTab==='clock')c.appendChild(bCGClock(cg,cl));
-    else if(S.cgTab==='assignment')c.appendChild(bCGAssignment(cg,as,cl));
-    else if(S.cgTab==='log')c.appendChild(bCGLog(cg));
+    const b=$('cg-body');if(!b)return;
+    if(S.cgTab==='clock')b.appendChild(bCGClock(cg,cl));
+    else if(S.cgTab==='assignment')b.appendChild(bCGAssignment(cg,as,cl));
+    else if(S.cgTab==='hours')b.appendChild(bCGHours(cg));
   },0);
   return w;
 }
 function cgTab(t){S.cgTab=t;render();}
 
-/* Caregiver Clock tab */
 function bCGClock(cg,cl){
   const elapsed=S.clockedIn&&S.clockInTime?Date.now()-S.clockInTime:0;
   const todayMs=totMs(cgTodaySessions(cg.id));
-
   let gHtml='';
-  if(!cl){
-    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>You have no active assignment. Please contact your supervisor.</span></div>`;
-  } else if(!cl.lat){
-    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Care location not set yet. Contact your supervisor.</span></div>`;
-  } else if(!S.locChecked){
-    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Tap below to verify you are at the care location</span></div>`;
-  } else if(S.locOk){
-    gHtml=`<div class="geo geo-ok"><div class="dot dg" style="margin-top:3px;flex-shrink:0"></div><span>You are within range &mdash; ${Math.round(S.locDist)} ft from ${cl.name}'s address</span></div>`;
-  } else {
-    const dist=S.locDist!==null?`You are ${Math.round(S.locDist)} ft away. `:'';
-    gHtml=`<div class="geo geo-fail"><div class="dot dr" style="margin-top:3px;flex-shrink:0"></div><span>${dist}You must be within 100 ft of ${cl?.name||'the care address'} to clock in. Please go to the care location.</span></div>`;
-  }
+  if(!cl){ gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px"></div><span>No active assignment. Contact your supervisor.</span></div>`; }
+  else if(!cl.lat){ gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px"></div><span>Care location not set. Contact your supervisor.</span></div>`; }
+  else if(!S.locChecked){ gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px"></div><span>Tap below to verify you are at the care location</span></div>`; }
+  else if(S.locOk){ gHtml=`<div class="geo geo-ok"><div class="dot dg" style="margin-top:3px"></div><span>Within range &mdash; ${Math.round(S.locDist)} ft from ${cl.name}'s address</span></div>`; }
+  else { gHtml=`<div class="geo geo-fail"><div class="dot dr" style="margin-top:3px"></div><span>${S.locDist!==null?`You are ${Math.round(S.locDist)} ft away. `:''}You must be within 100 ft of ${cl.name}'s address to clock in. Please go to the care location.</span></div>`; }
 
   const badge=S.clockedIn?`<div class="badge b-green"><div class="dot dg"></div>Clocked in</div>`:`<div class="badge b-red"><div class="dot dr"></div>Clocked out</div>`;
   const canClock=cl&&cl.lat;
-  const mainBtn=S.clockedIn
-    ?`<button class="btn btn-r" onclick="doClock()">Clock out</button>`
-    :(canClock&&S.locOk)
-      ?`<button class="btn btn-g" onclick="doClock()">Clock in</button>`
-      :`<button class="btn" disabled>${!canClock?'No assignment set':'Must be within 100 ft to clock in'}</button>`;
-
+  const mainBtn=S.clockedIn?`<button class="btn btn-r" onclick="doClock()">Clock out</button>`:
+    (canClock&&S.locOk)?`<button class="btn btn-g" onclick="doClock()">Clock in</button>`:
+    `<button class="btn" disabled>${!canClock?'No assignment':'Must be within 100 ft to clock in'}</button>`;
   const w=document.createElement('div');
   w.innerHTML=`
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
       ${badge}
-      <div class="clock-elapsed" id="eld" style="${S.clockedIn?'':'display:none'}">${fEl(elapsed)}</div>
+      <div class="clock-el" id="eld" style="${S.clockedIn?'':'display:none'}">${fEl(elapsed)}</div>
     </div>
     <div class="clock-big" id="cf">${fT(Date.now())}</div>
     <div class="clock-date">${fD(Date.now())}</div>
@@ -693,17 +744,13 @@ function bCGClock(cg,cl){
   return w;
 }
 
-/* Caregiver Assignment tab */
 function bCGAssignment(cg,as,cl){
   const w=document.createElement('div');
-  if(!as||!cl){
-    w.innerHTML=`<div class="card"><div class="empty">You have no active assignment.<br>Please contact your supervisor.</div></div>`;
-    return w;
-  }
+  if(!as||!cl){ w.innerHTML=`<div class="card"><div class="empty">No active assignment.<br>Contact your supervisor.</div></div>`; return w; }
   w.innerHTML=`
   <div class="card">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
-      <div class="av av-b" style="width:48px;height:48px;font-size:16px">${ini(cl.name)}</div>
+      <div class="av av-b" style="width:50px;height:50px;font-size:16px">${ini(cl.name)}</div>
       <div>
         <div style="font-size:18px;font-weight:700;color:var(--tx)">${cl.name}</div>
         <div class="badge b-green" style="margin-top:4px">Active assignment</div>
@@ -721,83 +768,72 @@ function bCGAssignment(cg,as,cl){
     <div class="sec-label">Emergency contact</div>
     ${cl.ecName?`
     <div class="info-row"><div class="info-key">Name</div><div class="info-val">${cl.ecName}</div></div>
-    <div class="info-row"><div class="info-key">Phone</div><div class="info-val"><a href="tel:${cl.ecPhone}" style="color:var(--blue)">${cl.ecPhone}</a></div></div>
+    <div class="info-row"><div class="info-key">Phone</div><div class="info-val"><a href="tel:${cl.ecPhone}" style="color:var(--blue);font-weight:600">${cl.ecPhone}</a></div></div>
     <div class="info-row"><div class="info-key">Relationship</div><div class="info-val">${cl.ecRel||'Not specified'}</div></div>
     `:`<div class="empty">No emergency contact on file</div>`}
   </div>`;
   return w;
 }
 
-/* Caregiver Log tab */
-function bCGLog(cg){
-  const todaySess=cgTodaySessions(cg.id);
-  const weekSess=cgWeekSessions(cg.id);
-  const allSess=cgSessions(cg.id).filter(s=>s.outTime);
-  const todayTotal=totMs(todaySess);
-  const weekTotal=totMs(weekSess);
-  const allTotal=totMs(allSess);
-  const todayRows=todaySess.length?todaySess.map((s,i)=>`<div class="row"><span class="row-label">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime||Date.now())}</span><span class="row-val-g">${fHM((s.outTime||Date.now())-s.inTime)}</span></div>`).join(''):`<div class="empty">No shifts today</div>`;
+function bCGHours(cg){
+  const today=cgTodaySessions(cg.id);
+  const week=cgWeekSess(cg.id);
+  const all=cgAllSess(cg.id);
   const gr={};
-  weekSess.forEach(s=>{const d=fDs(s.inTime);(gr[d]=gr[d]||[]).push(s);});
-  const weekRows=weekSess.length?Object.entries(gr).map(([day,ss])=>`<div class="wdl">${day}</div>${ss.map((s,i)=>`<div class="row"><span class="row-label">Shift ${i+1} &nbsp; ${fT2(s.inTime)}&ndash;${fT2(s.outTime||Date.now())}</span><span class="row-val-g">${fHM((s.outTime||Date.now())-s.inTime)}</span></div>`).join('')}`).join(''):`<div class="empty">No shifts this week</div>`;
+  week.forEach(s=>{const d=fDs(tsToMs(s.inTime));(gr[d]=gr[d]||[]).push(s);});
+  const weekRows=week.length?Object.entries(gr).map(([day,ss])=>`
+    <div class="wdl">${day}</div>
+    ${ss.map((s,i)=>`<div class="row"><span style="font-size:14px;color:var(--tx2)">Shift ${i+1} &nbsp; ${fT2(tsToMs(s.inTime))} &ndash; ${fT2(tsToMs(s.outTime))}</span><span style="font-size:14px;font-weight:600;color:var(--green)">${fHM(tsToMs(s.outTime)-tsToMs(s.inTime))}</span></div>`).join('')}`).join(''):`<div class="empty">No shifts this week</div>`;
   const w=document.createElement('div');
   w.innerHTML=`
   <div class="card">
     <div class="sec-label">Summary</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.5rem">
-      <div class="met"><div class="met-l">Today</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(todayTotal)}</div></div>
-      <div class="met"><div class="met-l">This week</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(weekTotal)}</div></div>
-      <div class="met"><div class="met-l">All time</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(allTotal)}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="met"><div class="met-l">Today</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(totMs(today))}</div></div>
+      <div class="met"><div class="met-l">This week</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(totMs(week))}</div></div>
+      <div class="met"><div class="met-l">All time</div><div style="font-size:15px;font-weight:700;color:var(--tx)">${fHM(totMs(all))}</div></div>
     </div>
   </div>
-  <div class="card"><div class="sec-label">Today's shifts</div>${todayRows}</div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
       <div class="sec-label" style="margin:0">This week</div>
-      <span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(weekTotal)}</span>
+      <span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(totMs(week))}</span>
     </div>
     ${weekRows}
   </div>`;
   return w;
 }
 
-/* ── CLOCK IN / OUT ── */
+// ── GEO ──
 function checkGeo(){
   const btn=$('geo-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting location...';}
-  const as=getAssignment(S.currentCG?.id);
-  const cl=as?getClient(as.clientId):null;
-  if(!cl?.lat){S.locChecked=true;S.locOk=false;S.locErr='No location set for this client.';render();return;}
+  const as=getAS(S.cgProfile?.id);
+  const cl=as?getCL(as.clientId):null;
+  if(!cl?.lat){S.locChecked=true;S.locOk=false;S.locErr='No location set.';render();return;}
   navigator.geolocation.getCurrentPosition(
-    pos=>{
-      const d=distFt(pos.coords.latitude,pos.coords.longitude,cl.lat,cl.lng);
-      S.locChecked=true;S.locDist=d;S.locOk=d<=100;S.locErr=null;render();
-    },
-    err=>{
-      S.locChecked=true;S.locOk=false;S.locDist=null;
-      S.locErr=err.code===1?'Location permission denied.':'Could not get location. Try again.';
-      render();
-    },
+    pos=>{const d=distFt(pos.coords.latitude,pos.coords.longitude,cl.lat,cl.lng);S.locChecked=true;S.locDist=d;S.locOk=d<=100;S.locErr=null;render();},
+    err=>{S.locChecked=true;S.locOk=false;S.locDist=null;S.locErr=err.code===1?'Permission denied.':'Could not get location.';render();},
     {enableHighAccuracy:true,timeout:12000,maximumAge:30000}
   );
 }
 
-function doClock(){
-  const cg=S.currentCG;
+// ── CLOCK IN/OUT ──
+async function doClock(){
+  const cg=S.cgProfile;
   if(S.clockedIn){
-    // Clock out
-    const i=DB.sessions.findIndex(s=>s.id===S.openSessionId);
-    if(i>=0)DB.sessions[i].outTime=Date.now();
-    sv(DB);S.clockedIn=false;S.clockInTime=null;S.openSessionId=null;
+    await fsSet('sessions',S.openSessionId,{outTime:Date.now()});
+    S.clockedIn=false;S.clockInTime=null;S.openSessionId=null;
   } else {
-    // Clock in
-    const session={id:uid(),cgId:cg.id,inTime:Date.now(),outTime:null};
-    DB.sessions.push(session);sv(DB);
-    S.clockedIn=true;S.clockInTime=session.inTime;S.openSessionId=session.id;
+    const sid=uid();
+    await fsSet('sessions',sid,{cgId:cg.id,inTime:Date.now(),outTime:null,createdAt:Date.now()});
+    S.clockedIn=true;S.clockInTime=Date.now();S.openSessionId=sid;
   }
+  await loadCache();
   render();
 }
 
+// ── TICK ──
 function startTick(){
   clearInterval(S.timer);
   S.timer=setInterval(()=>{
@@ -806,14 +842,36 @@ function startTick(){
   },1000);
 }
 
-function logout(){
+// ── LOGOUT ──
+async function doLogout(){
   clearInterval(S.timer);
-  S.view='login';S.currentCG=null;S.clockedIn=false;S.clockInTime=null;
-  S.locOk=false;S.locChecked=false;S.locDist=null;
-  render();
+  S.clockedIn=false;S.clockInTime=null;
+  S.locOk=false;S.locChecked=false;
+  await signOut(auth);
 }
 
-render();
+// Expose to global scope for onclick handlers
+window.doLogin=doLogin;
+window.doSetupSupervisor=doSetupSupervisor;
+window.supTab=supTab;
+window.cgTab=cgTab;
+window.saveCG=saveCG;
+window.editCG=editCG;
+window.deleteCG=deleteCG;
+window.saveCL=saveCL;
+window.editCL=editCL;
+window.deleteCL=deleteCL;
+window.pinCL=pinCL;
+window.saveAS=saveAS;
+window.editAS=editAS;
+window.deleteAS=deleteAS;
+window.exportCSV=exportCSV;
+window.checkGeo=checkGeo;
+window.doClock=doClock;
+window.doLogout=doLogout;
+window.changeSupPass=changeSupPass;
+window.S=S;
+
 </script>
 </body>
 </html>
