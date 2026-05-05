@@ -190,11 +190,11 @@ onAuthStateChanged(auth,async user=>{
     CURRENT_USER=null; USER_ROLE=null; CG_PROFILE=null; IS_SUP_SESSION=false;
     VIEW='login';
   }
-  render();
+  await render();
 });
 
 // ── RENDER ──
-function render(){
+async function render(){
   clearInterval(TICK);
   const app=$('app');
   if(VIEW==='loading'){app.innerHTML=`<div class="loading"><div class="spin" style="width:24px;height:24px;border-width:3px"></div><p style="color:var(--tx2);font-size:14px">Loading...</p></div>`;return;}
@@ -392,7 +392,7 @@ async function buildSupervisor(){
   ${body}`;
 }
 
-window.supTab=function(t){SUP_TAB=t;EDIT_CG=null;EDIT_CL=null;EDIT_AS=null;render();};
+window.supTab=async function(t){SUP_TAB=t;EDIT_CG=null;EDIT_CL=null;EDIT_AS=null;await render();};
 
 // Dashboard
 function buildSupDash(){
@@ -517,14 +517,14 @@ async function buildSupCG(){
   </div>`;
 }
 
-window.editCG=function(id){EDIT_CG=DB.caregivers.find(c=>c.id===id)||null;SUP_TAB='caregivers';render();};
-window.cancelEditCG=function(){EDIT_CG=null;render();};
+window.editCG=async function(id){EDIT_CG=DB.caregivers.find(c=>c.id===id)||null;SUP_TAB='caregivers';await render();};
+window.cancelEditCG=async function(){EDIT_CG=null;await render();};
 
 window.unlockCG=async function(email){
   if(!confirm('Unlock '+email+'? They will be able to log in again.'))return;
   await clearLockout(email);
   SUP_TAB='caregivers';
-  render();
+  await render();
   alert('Account unlocked for '+email);
 };
 
@@ -563,14 +563,14 @@ window.saveCG=async function(){
     }
     await loadCache();
     EDIT_CG=null;
-    render();
+    await render();
   } catch(e){setMsg('cg-msg','Error: '+e.message,'merr');}
 };
 
 window.deleteCG=async function(id){
   if(!confirm('Delete this caregiver? Their shift history will be kept.'))return;
   await fsDel('caregivers',id);
-  await loadCache(); render();
+  await loadCache(); await render();
 };
 
 // Clients
@@ -658,8 +658,8 @@ function buildSupCL(){
   </div>`;
 }
 
-window.editCL=function(id){EDIT_CL=DB.clients.find(c=>c.id===id)||null;SUP_TAB='clients';render();};
-window.cancelEditCL=function(){EDIT_CL=null;render();};
+window.editCL=async function(id){EDIT_CL=DB.clients.find(c=>c.id===id)||null;SUP_TAB='clients';await render();};
+window.cancelEditCL=async function(){EDIT_CL=null;await render();};
 
 window.geocodeCL=async function(){
   const street=($('cl-str').value||'').trim();
@@ -724,14 +724,14 @@ window.saveCL=async function(){
   try{
     if(EDIT_CL){await fsSet('clients',EDIT_CL.id,data);EDIT_CL=null;}
     else{data.createdAt=Date.now();await fsAdd('clients',data);}
-    await loadCache(); render();
+    await loadCache(); await render();
   }catch(e){setMsg('cl-msg','Error: '+e.message,'merr');}
 };
 
 window.deleteCL=async function(id){
   if(!confirm('Delete this client?'))return;
   await fsDel('clients',id);
-  await loadCache(); render();
+  await loadCache(); await render();
 };
 
 // Assignments
@@ -798,8 +798,8 @@ function buildSupAS(){
   </div>`;
 }
 
-window.editAS=function(id){EDIT_AS=DB.assignments.find(a=>a.id===id)||null;SUP_TAB='assignments';render();};
-window.cancelEditAS=function(){EDIT_AS=null;render();};
+window.editAS=async function(id){EDIT_AS=DB.assignments.find(a=>a.id===id)||null;SUP_TAB='assignments';await render();};
+window.cancelEditAS=async function(){EDIT_AS=null;await render();};
 
 window.saveAS=async function(){
   const cgId=($('as-cg').value||'').trim();
@@ -821,14 +821,14 @@ window.saveAS=async function(){
   try{
     if(EDIT_AS){await fsSet('assignments',EDIT_AS.id,data);EDIT_AS=null;}
     else{data.createdAt=Date.now();await fsAdd('assignments',data);}
-    await loadCache(); render();
+    await loadCache(); await render();
   }catch(e){setMsg('as-msg','Error: '+e.message,'merr');}
 };
 
 window.deleteAS=async function(id){
   if(!confirm('Remove this assignment?'))return;
   await fsDel('assignments',id);
-  await loadCache(); render();
+  await loadCache(); await render();
 };
 
 // Reports
@@ -905,7 +905,7 @@ function buildCaregiver(){
   ${body}`;
 }
 
-window.cgTab=function(t){CG_TAB=t;render();};
+window.cgTab=async function(t){CG_TAB=t;await render();};
 
 function buildCGClock(cg,cl){
   const elapsed=CLOCKED_IN&&CLOCK_IN_TIME?Date.now()-CLOCK_IN_TIME:0;
@@ -1027,7 +1027,7 @@ window.doClock=async function(){
     await fsSet('sessions',sid,{cgId:cg.id,inTime:Date.now(),outTime:null,createdAt:Date.now()});
     CLOCKED_IN=true;CLOCK_IN_TIME=Date.now();OPEN_SESSION_ID=sid;
   }
-  await loadCache(); render();
+  await loadCache(); await render();
 };
 
 // ── TICK ──
