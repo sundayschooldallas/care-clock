@@ -5,125 +5,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Care Clock">
 <title>Care Clock</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --green:#1D9E75; --green-l:#EAF3DE; --green-d:#0F6E56; --green-t:#3B6D11;
-  --red:#E24B4A; --red-l:#FCEBEB; --red-t:#A32D2D;
-  --amber:#EF9F27; --amber-l:#FAEEDA; --amber-t:#854F0B;
-  --blue:#378ADD; --blue-l:#E6F1FB; --blue-t:#185FA5;
-  --bg:#f5f5f3; --card:#fff; --bdr:rgba(0,0,0,.1); --bdr2:rgba(0,0,0,.2);
-  --tx:#1a1a1a; --tx2:#555; --tx3:#999;
-  --r:12px; --rs:8px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#1D9E75;--green-l:#EAF3DE;--green-d:#0F6E56;--green-t:#3B6D11;
+  --red:#E24B4A;--red-l:#FCEBEB;--red-t:#A32D2D;
+  --amber:#EF9F27;--amber-l:#FAEEDA;--amber-t:#854F0B;
+  --blue:#378ADD;--blue-l:#E6F1FB;--blue-t:#185FA5;
+  --purple:#7F77DD;--purple-l:#EEEDFE;--purple-t:#3C3489;
+  --bg:#f5f5f3;--card:#fff;--bdr:rgba(0,0,0,.1);--bdr2:rgba(0,0,0,.18);
+  --tx:#1a1a1a;--tx2:#555;--tx3:#999;
+  --r:12px;--rs:8px;
 }
-@media(prefers-color-scheme:dark){
-  :root{
-    --bg:#111; --card:#1e1e1e; --bdr:rgba(255,255,255,.1); --bdr2:rgba(255,255,255,.2);
-    --tx:#f0f0f0; --tx2:#aaa; --tx3:#666;
-    --green-l:#0a2e1e; --green-t:#5DCAA5;
-    --red-l:#2e0a0a; --red-t:#F09595;
-    --amber-l:#2e1e00; --amber-t:#FAC775;
-    --blue-l:#0a1e2e; --blue-t:#85B7EB;
-  }
-}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111;--card:#1e1e1e;--bdr:rgba(255,255,255,.1);--bdr2:rgba(255,255,255,.2);
+  --tx:#f0f0f0;--tx2:#aaa;--tx3:#666;
+  --green-l:#0a2e1e;--green-t:#5DCAA5;--red-l:#2e0a0a;--red-t:#F09595;
+  --amber-l:#2e1e00;--amber-t:#FAC775;--blue-l:#0a1e2e;--blue-t:#85B7EB;
+  --purple-l:#1a1840;--purple-t:#AFA9EC;
+}}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-body{padding-bottom:env(safe-area-inset-bottom);}
-#app{max-width:480px;margin:0 auto;padding:1rem;min-height:100vh;}
+#app{max-width:520px;margin:0 auto;padding:1rem;min-height:100vh;}
+
+/* Cards */
 .card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;}
-.lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:.75rem;}
-.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
-.av{width:42px;height:42px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--green-t);flex-shrink:0;}
-.tabs{display:flex;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:3px;margin-bottom:1rem;gap:2px;}
-.tab{flex:1;padding:7px 4px;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:transparent;color:var(--tx2);}
-.tab.on{background:var(--bg);color:var(--tx);font-weight:700;}
-.tbig{font-size:44px;font-weight:300;color:var(--tx);letter-spacing:-2px;text-align:center;margin:.5rem 0;font-variant-numeric:tabular-nums;}
-.dsm{font-size:14px;color:var(--tx2);text-align:center;}
-.eld{font-size:16px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums;}
-.bdg{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;}
-.bdg-in{background:var(--green-l);color:var(--green-t);}
-.bdg-out{background:var(--red-l);color:var(--red-t);}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.card-flat{background:var(--bg);border-radius:var(--rs);padding:.875rem;margin-bottom:.75rem;}
+
+/* Typography */
+.page-title{font-size:22px;font-weight:700;color:var(--tx);margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--tx2);margin-bottom:1.25rem;}
+.sec-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin-bottom:.75rem;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.b-green{background:var(--green-l);color:var(--green-t);}
+.b-red{background:var(--red-l);color:var(--red-t);}
+.b-amber{background:var(--amber-l);color:var(--amber-t);}
+.b-blue{background:var(--blue-l);color:var(--blue-t);}
+.b-purple{background:var(--purple-l);color:var(--purple-t);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .dg{background:var(--green);animation:pulse 1.5s infinite;}
 .dr{background:var(--red);}
 .da{background:var(--amber);}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:flex-start;gap:8px;line-height:1.4;}
-.g-ok{background:var(--green-l);color:var(--green-t);}
-.g-fail{background:var(--red-l);color:var(--red-t);}
-.g-neu{background:var(--amber-l);color:var(--amber-t);}
-.btn{width:100%;padding:13px;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Buttons */
+.btn{width:100%;padding:12px;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s;}
 .btn:active{transform:scale(.98);}
-.bg{background:var(--green);color:#fff;}.bg:hover{opacity:.9;}
-.br{background:var(--red);color:#fff;}.br:hover{opacity:.9;}
-.bo{background:transparent;border:1px solid var(--bdr2);color:var(--tx);}
-.bo:hover{background:var(--bg);}
+.btn-g{background:var(--green);color:#fff;}.btn-g:hover{opacity:.9;}
+.btn-r{background:var(--red);color:#fff;}.btn-r:hover{opacity:.9;}
+.btn-b{background:var(--blue);color:#fff;}.btn-b:hover{opacity:.9;}
+.btn-o{background:transparent;border:1px solid var(--bdr2);color:var(--tx);}
+.btn-o:hover{background:var(--bg);}
 .btn:disabled{background:var(--bdr);color:var(--tx3);cursor:not-allowed;transform:none;}
-.bsm{padding:7px 14px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;background:transparent;border:1px solid var(--bdr2);color:var(--tx2);}
-.bdel{background:transparent;border:1px solid rgba(226,75,74,.3);color:var(--red-t);width:100%;padding:11px;border-radius:var(--rs);font-size:14px;font-weight:500;cursor:pointer;}
-.fld{margin-bottom:.875rem;}
-.fld label{display:block;font-size:13px;font-weight:500;color:var(--tx2);margin-bottom:5px;}
-.fld input{width:100%;padding:10px 12px;font-size:15px;border:1px solid var(--bdr2);border-radius:var(--rs);background:var(--card);color:var(--tx);outline:none;transition:border .15s;}
-.fld input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(55,138,221,.15);}
-.fld input::placeholder{color:var(--tx3);}
-.hint{font-size:12px;color:var(--tx3);margin-top:5px;line-height:1.4;}
+.btn-sm{padding:6px 14px;font-size:13px;font-weight:500;border-radius:var(--rs);cursor:pointer;background:transparent;border:1px solid var(--bdr2);color:var(--tx2);}
+.btn-sm:hover{background:var(--bg);}
+.btn-icon{padding:6px 10px;font-size:13px;border-radius:var(--rs);cursor:pointer;background:transparent;border:1px solid var(--bdr2);color:var(--tx2);}
+.btn-del{background:transparent;border:1px solid rgba(226,75,74,.3);color:var(--red-t);padding:8px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;}
+
+/* Forms */
+.fld{margin-bottom:.75rem;}
+.fld label{display:block;font-size:13px;font-weight:500;color:var(--tx2);margin-bottom:4px;}
+.fld input,.fld select,.fld textarea{width:100%;padding:9px 12px;font-size:14px;border:1px solid var(--bdr2);border-radius:var(--rs);background:var(--card);color:var(--tx);outline:none;transition:border .15s;font-family:inherit;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(55,138,221,.12);}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--tx3);}
+.fld textarea{resize:vertical;min-height:70px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hint{font-size:12px;color:var(--tx3);margin-top:4px;}
+
+/* Divider */
 .div{height:1px;background:var(--bdr);margin:.875rem 0;}
+
+/* Nav tabs */
+.nav{display:flex;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:3px;margin-bottom:1rem;gap:2px;}
+.nav-tab{flex:1;padding:7px 4px;font-size:12px;font-weight:500;border-radius:6px;cursor:pointer;border:none;background:transparent;color:var(--tx2);}
+.nav-tab.on{background:var(--bg);color:var(--tx);font-weight:700;}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bdr);font-weight:600;color:var(--tx3);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.tbl td{padding:9px 6px;border-bottom:1px solid var(--bdr);color:var(--tx);}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* Rows */
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
+.row:last-child{border-bottom:none;}
+.row-label{font-size:14px;color:var(--tx2);}
+.row-val{font-size:14px;font-weight:600;color:var(--tx);}
+.row-val-g{font-size:14px;font-weight:600;color:var(--green);}
+
+/* Metric grid */
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
 .met{background:var(--bg);border-radius:var(--rs);padding:.875rem;}
-.ml{font-size:11px;color:var(--tx3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
-.mv{font-size:22px;font-weight:700;color:var(--tx);}
-.lrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bdr);}
-.lrow:last-child{border-bottom:none;}
-.ll{font-size:14px;color:var(--tx2);}
-.lv{font-size:14px;font-weight:600;color:var(--green);}
-.trow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;}
-.stbl{width:100%;border-collapse:collapse;font-size:13px;}
-.stbl th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--bdr);font-weight:600;color:var(--tx3);font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
-.stbl td{padding:10px 6px;border-bottom:1px solid var(--bdr);color:var(--tx);}
-.stbl tr:last-child td{border-bottom:none;}
-.wdl{font-size:12px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:.75rem 0 4px;}
-.noti{font-size:12px;color:var(--tx3);text-align:center;margin-top:.5rem;line-height:1.4;}
-.emp{font-size:14px;color:var(--tx3);text-align:center;padding:2rem 1rem;}
-.smsg{font-size:13px;min-height:20px;margin-bottom:.75rem;line-height:1.5;}
-.mok{color:var(--green-t);} .merr{color:var(--red-t);} .mneu{color:var(--tx3);}
-.sscr{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.met-l{font-size:11px;color:var(--tx3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+.met-v{font-size:22px;font-weight:700;color:var(--tx);}
+
+/* Avatar */
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.av-g{background:var(--green-l);color:var(--green-t);}
+.av-b{background:var(--blue-l);color:var(--blue-t);}
+.av-p{background:var(--purple-l);color:var(--purple-t);}
+
+/* Clock display */
+.clock-big{font-size:44px;font-weight:300;letter-spacing:-2px;text-align:center;margin:.5rem 0;font-variant-numeric:tabular-nums;color:var(--tx);}
+.clock-date{font-size:14px;color:var(--tx2);text-align:center;}
+.clock-elapsed{font-size:16px;font-weight:700;color:var(--green);text-align:center;margin-top:4px;font-variant-numeric:tabular-nums;}
+
+/* Geo bar */
+.geo{font-size:13px;padding:10px 12px;border-radius:var(--rs);margin-bottom:.75rem;display:flex;align-items:flex-start;gap:8px;line-height:1.4;}
+.geo-ok{background:var(--green-l);color:var(--green-t);}
+.geo-fail{background:var(--red-l);color:var(--red-t);}
+.geo-neu{background:var(--amber-l);color:var(--amber-t);}
+
+/* Misc */
+.empty{font-size:14px;color:var(--tx3);text-align:center;padding:2rem 1rem;}
+.smsg{font-size:13px;min-height:18px;margin-bottom:.75rem;line-height:1.5;}
+.mok{color:var(--green-t);}.merr{color:var(--red-t);}.mneu{color:var(--tx3);}
 .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bdr);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes sp{to{transform:rotate(360deg)}}
-/* Admin panel styles */
-.admin-lock{position:absolute;top:1rem;right:1rem;background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;padding:4px;}
-.admin-overlay{background:rgba(0,0,0,.5);position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem;}
-.admin-modal{background:var(--card);border-radius:var(--r);padding:1.5rem;width:100%;max-width:400px;}
-.admin-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--blue-l);color:var(--blue-t);margin-bottom:1rem;}
-.coord-display{background:var(--bg);border-radius:var(--rs);padding:.75rem;font-size:12px;color:var(--tx2);font-variant-numeric:tabular-nums;margin-bottom:.75rem;line-height:1.6;}
-.coord-display strong{color:var(--tx);display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.noti{font-size:12px;color:var(--tx3);text-align:center;margin-top:.5rem;line-height:1.4;}
+.hrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.info-row{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--bdr);}
+.info-row:last-child{border-bottom:none;}
+.info-key{font-size:12px;color:var(--tx3);min-width:110px;padding-top:2px;}
+.info-val{font-size:13px;color:var(--tx);line-height:1.5;}
+.wdl{font-size:12px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin:.75rem 0 4px;}
 </style>
 </head>
 <body>
 <div id="app"></div>
-
 <script>
-const KEY='care_clock_v6';
-function load(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}return{config:null,sessions:[]};}
-function save(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
+const KEY='careclock_v7';
+function ld(){try{const r=localStorage.getItem(KEY);if(r)return JSON.parse(r);}catch(e){}
+  return{
+    supervisor:{name:'Supervisor',password:'admin1234'},
+    caregivers:[],
+    clients:[],
+    assignments:[],
+    sessions:[]
+  };
+}
+function sv(d){try{localStorage.setItem(KEY,JSON.stringify(d));}catch(e){}}
 
-let data=load();
+let DB=ld();
 let S={
-  view:data.config?'main':'admin_setup',
-  tab:'clock',
-  in:false,inTime:null,
+  view:'login', // login | supervisor | caregiver
+  supTab:'dashboard',
+  cgTab:'clock',
+  currentCG:null, // logged in caregiver object
   locOk:false,locChecked:false,locDist:null,locErr:null,
+  clockedIn:false,clockInTime:null,
   timer:null,
-  showAdmin:false,
-  adminAuth:false,
-  adminPinning:false
+  editCG:null,editCL:null,editAS:null
 };
 
-const ADMIN_PASS='admin1234'; // Default admin password - change in admin panel
-const MAX_DIST_FT=100; // 100 feet radius
-
 const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9);
 function toRad(v){return v*Math.PI/180;}
 function distFt(a,b,c,d){const R=3958.8,dL=toRad(c-a),dO=toRad(d-b),x=Math.sin(dL/2)**2+Math.cos(toRad(a))*Math.cos(toRad(c))*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))*5280;}
 function fT(ts){return new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
@@ -133,329 +173,644 @@ function fDs(ts){return new Date(ts).toLocaleDateString('en-US',{weekday:'short'
 function fEl(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return`${h}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;}
 function fHM(ms){const t=Math.floor(ms/60000),h=Math.floor(t/60),m=t%60;return`${h}h ${m}m`;}
 function ini(n){return(n||'?').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-function todayS(){const t=new Date().toDateString();return data.sessions.filter(s=>new Date(s.inTime).toDateString()===t);}
-function weekS(){const now=new Date(),d=now.getDay(),st=new Date(now);st.setDate(now.getDate()-d);st.setHours(0,0,0,0);return data.sessions.filter(s=>new Date(s.inTime)>=st);}
-function totMs(arr){return arr.reduce((s,x)=>s+(x.outTime-x.inTime),0);}
 function setMsg(id,html,cls){const e=$(id);if(e){e.className='smsg '+cls;e.innerHTML=html;}}
+function cgSessions(cgId){return DB.sessions.filter(s=>s.cgId===cgId);}
+function cgTodaySessions(cgId){const t=new Date().toDateString();return DB.sessions.filter(s=>s.cgId===cgId&&new Date(s.inTime).toDateString()===t);}
+function cgWeekSessions(cgId){const now=new Date(),d=now.getDay(),st=new Date(now);st.setDate(now.getDate()-d);st.setHours(0,0,0,0);return DB.sessions.filter(s=>s.cgId===cgId&&new Date(s.inTime)>=st);}
+function totMs(arr){return arr.reduce((s,x)=>s+(x.outTime-x.inTime),0);}
+function getAssignment(cgId){return DB.assignments.find(a=>a.cgId===cgId);}
+function getClient(id){return DB.clients.find(c=>c.id===id);}
+function getCaregiver(id){return DB.caregivers.find(c=>c.id===id);}
 
 function render(){
   const app=$('app');app.innerHTML='';clearInterval(S.timer);
-  if(S.view==='admin_setup'){app.appendChild(bAdminSetup());return;}
-  if(S.showAdmin){app.appendChild(bAdminOverlay());}
-  app.appendChild(bHeader());
-  app.appendChild(bTabs());
-  if(S.tab==='clock'){app.appendChild(bClock());startTick();}
-  else if(S.tab==='log')app.appendChild(bLog());
-  else if(S.tab==='sheet')app.appendChild(bSheet());
+  if(S.view==='login')app.appendChild(bLogin());
+  else if(S.view==='supervisor')app.appendChild(bSupervisor());
+  else if(S.view==='caregiver')app.appendChild(bCaregiver());
 }
 
-/* ── ADMIN SETUP (first time) ── */
-function bAdminSetup(){
-  const w=document.createElement('div');w.style.padding='1.5rem 0';
+/* ═══════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════ */
+function bLogin(){
+  const w=document.createElement('div');w.style.padding='2rem 0';
   w.innerHTML=`
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:28px">&#128305;</div>
+    <div style="font-size:26px;font-weight:700;color:var(--tx)">Care Clock</div>
+    <div style="font-size:14px;color:var(--tx2);margin-top:4px">Caregiver time &amp; client management</div>
+  </div>
   <div class="card">
-    <div style="text-align:center;margin-bottom:1.5rem">
-      <div style="width:60px;height:60px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;margin:0 auto .875rem;font-size:26px">&#128274;</div>
-      <div style="font-size:22px;font-weight:700;color:var(--tx)">Supervisor Setup</div>
-      <div style="font-size:14px;color:var(--tx2);margin-top:4px">Configure Care Clock for your caregiver</div>
+    <div class="fld"><label>Username / Employee ID</label><input id="l-user" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="off"></div>
+    <div class="fld"><label>Password</label><input id="l-pass" type="password" placeholder="Enter your password" autocomplete="off"></div>
+    <div id="l-msg" class="smsg merr" style="min-height:16px"></div>
+    <button class="btn btn-g" onclick="doLogin()">Sign in</button>
+  </div>
+  <div style="text-align:center;font-size:12px;color:var(--tx3);margin-top:.5rem">Supervisor default: <strong>admin</strong> / <strong>admin1234</strong></div>`;
+  const inp=$('l-pass');if(inp)inp.onkeydown=e=>{if(e.key==='Enter')doLogin();};
+  return w;
+}
+
+function doLogin(){
+  const user=($('l-user').value||'').trim().toLowerCase();
+  const pass=($('l-pass').value||'').trim();
+  if(!user||!pass){setMsg('l-msg','Please enter username and password.','merr');return;}
+  // Check supervisor
+  if(user==='admin'||user===DB.supervisor.name.toLowerCase()){
+    if(pass===DB.supervisor.password){S.view='supervisor';S.supTab='dashboard';render();return;}
+    else{setMsg('l-msg','Incorrect password.','merr');return;}
+  }
+  // Check caregivers
+  const cg=DB.caregivers.find(c=>c.username.toLowerCase()===user);
+  if(!cg){setMsg('l-msg','Username not found.','merr');return;}
+  if(cg.password!==pass){setMsg('l-msg','Incorrect password.','merr');return;}
+  S.currentCG=cg;S.view='caregiver';S.cgTab='clock';
+  S.locOk=false;S.locChecked=false;S.locDist=null;S.locErr=null;
+  // Restore clock state if clocked in
+  const openSession=DB.sessions.find(s=>s.cgId===cg.id&&!s.outTime);
+  if(openSession){S.clockedIn=true;S.clockInTime=openSession.inTime;S.openSessionId=openSession.id;}
+  else{S.clockedIn=false;S.clockInTime=null;}
+  render();
+}
+
+/* ═══════════════════════════════════════
+   SUPERVISOR PORTAL
+═══════════════════════════════════════ */
+function bSupervisor(){
+  const w=document.createElement('div');
+  // Header
+  w.innerHTML=`
+  <div class="hrow">
+    <div>
+      <div style="font-size:20px;font-weight:700;color:var(--tx)">Supervisor Portal</div>
+      <div style="font-size:13px;color:var(--tx2)">Care Clock Management</div>
     </div>
-    <div class="admin-badge">&#128274; Supervisor only</div>
-    <div class="fld"><label>Family / Client name</label><input id="af" placeholder="e.g. Brukeyey Family" autocomplete="off"></div>
-    <div class="fld"><label>Caregiver name</label><input id="ac" placeholder="e.g. Edwinia Roberson" autocomplete="off"></div>
-    <div class="fld"><label>Care address (for display)</label><input id="aa" placeholder="9304 Forest Lane, Dallas, TX 75243" autocomplete="off"></div>
-    <div class="fld"><label>Supervisor password</label><input id="ap" type="password" placeholder="Set a password to protect settings" autocomplete="off"><div class="hint">You will need this to access supervisor settings later. Default is: admin1234</div></div>
-    <div class="div"></div>
-    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.75rem">Pin the care location</div>
-    <div style="font-size:13px;color:var(--tx2);margin-bottom:.875rem;line-height:1.6;">Go to the care home address and tap the button below to save its exact GPS location. The caregiver must be within <strong>100 ft</strong> of this location to clock in.</div>
-    <div style="background:var(--bg);border:1px dashed var(--bdr2);border-radius:var(--rs);padding:1rem;margin-bottom:.75rem;text-align:center;">
-      <button class="btn bo" id="apin-btn" onclick="adminPin()" style="margin-bottom:8px">&#x1F4CD; Pin care location now</button>
-      <div id="apin-status" style="font-size:12px;min-height:18px;font-variant-numeric:tabular-nums;"></div>
+    <button class="btn-sm" onclick="logout()">Sign out</button>
+  </div>
+  <div class="nav">
+    <button class="nav-tab ${S.supTab==='dashboard'?'on':''}" onclick="supTab('dashboard')">Dashboard</button>
+    <button class="nav-tab ${S.supTab==='caregivers'?'on':''}" onclick="supTab('caregivers')">Caregivers</button>
+    <button class="nav-tab ${S.supTab==='clients'?'on':''}" onclick="supTab('clients')">Clients</button>
+    <button class="nav-tab ${S.supTab==='assignments'?'on':''}" onclick="supTab('assignments')">Assignments</button>
+    <button class="nav-tab ${S.supTab==='reports'?'on':''}" onclick="supTab('reports')">Reports</button>
+  </div>
+  <div id="sup-content"></div>`;
+  setTimeout(()=>{
+    const c=$('sup-content');if(!c)return;
+    if(S.supTab==='dashboard')c.appendChild(bSupDashboard());
+    else if(S.supTab==='caregivers')c.appendChild(bSupCaregivers());
+    else if(S.supTab==='clients')c.appendChild(bSupClients());
+    else if(S.supTab==='assignments')c.appendChild(bSupAssignments());
+    else if(S.supTab==='reports')c.appendChild(bSupReports());
+  },0);
+  return w;
+}
+function supTab(t){S.supTab=t;S.editCG=null;S.editCL=null;S.editAS=null;render();}
+
+/* Dashboard */
+function bSupDashboard(){
+  const w=document.createElement('div');
+  const todayAll=DB.sessions.filter(s=>new Date(s.inTime).toDateString()===new Date().toDateString()&&s.outTime);
+  const activeNow=DB.sessions.filter(s=>!s.outTime);
+  w.innerHTML=`
+  <div class="mgrid">
+    <div class="met"><div class="met-l">Caregivers</div><div class="met-v">${DB.caregivers.length}</div></div>
+    <div class="met"><div class="met-l">Clients</div><div class="met-v">${DB.clients.length}</div></div>
+    <div class="met"><div class="met-l">Active now</div><div class="met-v" style="color:var(--green)">${activeNow.length}</div></div>
+    <div class="met"><div class="met-l">Shifts today</div><div class="met-v">${todayAll.length}</div></div>
+  </div>
+  <div class="card">
+    <div class="sec-label">Currently clocked in</div>
+    ${activeNow.length?activeNow.map(s=>{
+      const cg=getCaregiver(s.cgId);
+      const as=getAssignment(s.cgId);
+      const cl=as?getClient(as.clientId):null;
+      return`<div class="row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="av av-g">${ini(cg?.name)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg?.name||'Unknown'}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'}</div>
+          </div>
+        </div>
+        <div>
+          <div class="badge b-green"><div class="dot dg"></div>Active</div>
+          <div style="font-size:12px;color:var(--tx3);text-align:right;margin-top:2px">since ${fT2(s.inTime)}</div>
+        </div>
+      </div>`;}).join(''):`<div class="empty">No one is currently clocked in</div>`}
+  </div>
+  <div class="card">
+    <div class="sec-label">Quick actions</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn btn-o" onclick="supTab('caregivers')">+ Add caregiver</button>
+      <button class="btn btn-o" onclick="supTab('clients')">+ Add client</button>
+      <button class="btn btn-o" onclick="supTab('assignments')">+ New assignment</button>
+      <button class="btn btn-o" onclick="supTab('reports')">View reports</button>
     </div>
-    <div id="as-msg" class="smsg mneu"></div>
-    <button class="btn bg" id="as-save" onclick="adminSave()">Save &amp; launch app</button>
+  </div>
+  <div class="card">
+    <div class="sec-label">Supervisor settings</div>
+    <div class="fld"><label>Change supervisor password</label><input id="sup-pw" type="password" placeholder="New password" autocomplete="off"></div>
+    <div id="sup-pw-msg" class="smsg mneu" style="min-height:14px"></div>
+    <button class="btn btn-o" onclick="changeSupPass()">Update password</button>
   </div>`;
   return w;
 }
 
-/* ── ADMIN OVERLAY (password protected) ── */
-function bAdminOverlay(){
-  const cfg=data.config||{};
-  const w=document.createElement('div');
-  w.className='admin-overlay';
-  w.onclick=e=>{if(e.target===w){S.showAdmin=false;S.adminAuth=false;render();}};
+function changeSupPass(){
+  const p=($('sup-pw').value||'').trim();
+  if(!p||p.length<4){setMsg('sup-pw-msg','Password must be at least 4 characters.','merr');return;}
+  DB.supervisor.password=p;sv(DB);
+  setMsg('sup-pw-msg','Password updated!','mok');
+  $('sup-pw').value='';
+}
 
-  if(!S.adminAuth){
-    w.innerHTML=`<div class="admin-modal">
-      <div style="font-size:18px;font-weight:700;color:var(--tx);margin-bottom:4px">Supervisor access</div>
-      <div style="font-size:13px;color:var(--tx2);margin-bottom:1rem">Enter your supervisor password to continue.</div>
-      <div class="fld"><label>Password</label><input id="adm-pw" type="password" placeholder="Enter password" autocomplete="off"></div>
-      <div id="adm-msg" class="smsg merr" style="min-height:16px"></div>
-      <button class="btn bg" onclick="checkAdminPass()">Unlock</button>
-      <button class="btn bo" style="margin-top:.5rem" onclick="closeAdmin()">Cancel</button>
-    </div>`;
-  } else {
-    w.innerHTML=`<div class="admin-modal" style="max-height:90vh;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-        <div>
-          <div class="admin-badge">&#128274; Supervisor panel</div>
-          <div style="font-size:18px;font-weight:700;color:var(--tx)">Settings</div>
+/* Caregivers */
+function bSupCaregivers(){
+  const w=document.createElement('div');
+  const editing=S.editCG;
+  w.innerHTML=`
+  <div class="card">
+    <div class="sec-label">${editing?'Edit caregiver':'Add new caregiver'}</div>
+    <div class="frow">
+      <div class="fld"><label>Full name</label><input id="cg-name" value="${editing?.name||''}" placeholder="Full name" autocomplete="off"></div>
+      <div class="fld"><label>Phone</label><input id="cg-phone" value="${editing?.phone||''}" placeholder="Phone number" autocomplete="off"></div>
+    </div>
+    <div class="frow">
+      <div class="fld"><label>Username</label><input id="cg-user" value="${editing?.username||''}" placeholder="Login username" autocorrect="off" autocapitalize="off" autocomplete="off"></div>
+      <div class="fld"><label>Password</label><input id="cg-pass" value="${editing?.password||''}" placeholder="Login password" autocomplete="off"></div>
+    </div>
+    <div class="fld"><label>Email (optional)</label><input id="cg-email" value="${editing?.email||''}" placeholder="Email address" autocomplete="off"></div>
+    <div id="cg-msg" class="smsg mneu"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" onclick="saveCG()">${editing?'Save changes':'Add caregiver'}</button>
+      ${editing?`<button class="btn btn-o" onclick="S.editCG=null;render()">Cancel</button>`:''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">All caregivers (${DB.caregivers.length})</div>
+    ${DB.caregivers.length?DB.caregivers.map(cg=>{
+      const as=getAssignment(cg.id);
+      const cl=as?getClient(as.clientId):null;
+      const todayMs=totMs(cgTodaySessions(cg.id));
+      return`<div class="row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="av av-g">${ini(cg.name)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg.name}</div>
+            <div style="font-size:12px;color:var(--tx2)">@${cg.username} &bull; ${cl?cl.name:'No assignment'}</div>
+            <div style="font-size:12px;color:var(--tx3)">Today: ${fHM(todayMs)}</div>
+          </div>
         </div>
-        <button style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx3)" onclick="closeAdmin()">&#x2715;</button>
-      </div>
-      <div class="fld"><label>Family / Client name</label><input id="cfg-f" value="${cfg.familyName||''}" autocomplete="off"></div>
-      <div class="fld"><label>Caregiver name</label><input id="cfg-c" value="${cfg.caregiverName||''}" autocomplete="off"></div>
-      <div class="fld"><label>Care address (display)</label><input id="cfg-a" value="${cfg.address||''}" autocomplete="off"></div>
-      <div class="fld"><label>New supervisor password</label><input id="cfg-p" type="password" placeholder="Leave blank to keep current" autocomplete="off"></div>
-      <div class="div"></div>
-      <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:.5rem">Care location (GPS)</div>
-      <div class="coord-display">
-        <strong>Current pinned location</strong>
-        ${cfg.lat ? `Lat: ${cfg.lat.toFixed(6)}<br>Lng: ${cfg.lng.toFixed(6)}<br>Radius: 100 ft` : 'No location pinned yet'}
-      </div>
-      <button class="btn bo" id="repin-btn" onclick="adminRepin()" style="margin-bottom:.75rem">&#x1F4CD; Re-pin care location</button>
-      <div id="repin-status" style="font-size:12px;min-height:16px;margin-bottom:.75rem;font-variant-numeric:tabular-nums;color:var(--green-t)"></div>
-      <div id="cfg-msg" class="smsg mneu"></div>
-      <button class="btn bg" style="margin-bottom:.5rem" onclick="adminUpdate()">Save changes</button>
-      <div class="div"></div>
-      <button class="bdel" onclick="adminClearSessions()">Clear all shift data</button>
-    </div>`;
-  }
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editCG('${cg.id}')">&#9998;</button>
+          <button class="btn-icon" style="color:var(--red-t)" onclick="deleteCG('${cg.id}')">&#128465;</button>
+        </div>
+      </div>`;}).join(''):`<div class="empty">No caregivers added yet</div>`}
+  </div>`;
   return w;
 }
 
-/* ── MAIN HEADER ── */
-function bHeader(){
-  const cfg=data.config||{};
-  const d=document.createElement('div');d.className='hrow';d.style.position='relative';
-  d.innerHTML=`
-    <div>
-      <div style="font-size:20px;font-weight:700;color:var(--tx)">${cfg.familyName||'Care Clock'}</div>
-      <div style="font-size:13px;color:var(--tx2);margin-top:2px">${cfg.caregiverName||'Caregiver'}</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <button class="admin-lock" onclick="openAdmin()" title="Supervisor access" style="position:static">&#9881;&#65039;</button>
-      <div class="av">${ini(cfg.caregiverName)}</div>
-    </div>`;
-  return d;
-}
-
-/* ── TABS ── */
-function bTabs(){
-  const row=document.createElement('div');row.className='tabs';
-  [['clock','Clock'],['log','Today'],['sheet','Timesheet']].forEach(([id,lbl])=>{
-    const b=document.createElement('button');b.className='tab'+(S.tab===id?' on':'');b.textContent=lbl;b.onclick=()=>{S.tab=id;render();};row.appendChild(b);
-  });
-  return row;
-}
-
-/* ── CLOCK TAB ── */
-function bClock(){
-  const elapsed=S.in&&S.inTime?Date.now()-S.inTime:0;
-  let gHtml='';
-  if(!S.locChecked){
-    gHtml=`<div class="geo g-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Tap below to verify your location</span></div>`;
-  } else if(S.locOk){
-    gHtml=`<div class="geo g-ok"><div class="dot dg" style="margin-top:3px;flex-shrink:0"></div><span>You are within range &mdash; ${Math.round(S.locDist)} ft from the care address</span></div>`;
+function saveCG(){
+  const name=($('cg-name').value||'').trim();
+  const phone=($('cg-phone').value||'').trim();
+  const username=($('cg-user').value||'').trim().toLowerCase();
+  const password=($('cg-pass').value||'').trim();
+  const email=($('cg-email').value||'').trim();
+  if(!name||!username||!password){setMsg('cg-msg','Name, username and password are required.','merr');return;}
+  // Check duplicate username
+  const dup=DB.caregivers.find(c=>c.username===username&&c.id!==S.editCG?.id);
+  if(dup){setMsg('cg-msg','That username is already taken.','merr');return;}
+  if(S.editCG){
+    const i=DB.caregivers.findIndex(c=>c.id===S.editCG.id);
+    if(i>=0)DB.caregivers[i]={...DB.caregivers[i],name,phone,username,password,email};
+    S.editCG=null;
   } else {
-    const msg=S.locDist!==null
-      ?`You are too far away &mdash; ${Math.round(S.locDist)} ft from the care address. You must be within 100 ft to clock in. Please go to the care location.`
-      :(S.locErr||'Could not get your location. Please try again.');
-    gHtml=`<div class="geo g-fail"><div class="dot dr" style="margin-top:3px;flex-shrink:0"></div><span>${msg}</span></div>`;
+    DB.caregivers.push({id:uid(),name,phone,username,password,email});
   }
-  const badge=S.in?`<div class="bdg bdg-in"><div class="dot dg"></div>Clocked in</div>`:`<div class="bdg bdg-out"><div class="dot dr"></div>Clocked out</div>`;
-  const mainBtn=S.in
-    ?`<button class="btn br" onclick="doClock()">Clock out</button>`
-    :S.locOk
-      ?`<button class="btn bg" onclick="doClock()">Clock in</button>`
-      :`<button class="btn" disabled>You must be within 100 ft to clock in</button>`;
+  sv(DB);render();
+}
+function editCG(id){S.editCG=DB.caregivers.find(c=>c.id===id)||null;S.supTab='caregivers';render();}
+function deleteCG(id){if(!confirm('Delete this caregiver?'))return;DB.caregivers=DB.caregivers.filter(c=>c.id!==id);DB.assignments=DB.assignments.filter(a=>a.cgId!==id);sv(DB);render();}
+
+/* Clients */
+function bSupClients(){
+  const w=document.createElement('div');
+  const editing=S.editCL;
+  w.innerHTML=`
+  <div class="card">
+    <div class="sec-label">${editing?'Edit client':'Add new client'}</div>
+    <div class="fld"><label>Client full name</label><input id="cl-name" value="${editing?.name||''}" placeholder="Full name" autocomplete="off"></div>
+    <div class="fld"><label>Care address</label><input id="cl-addr" value="${editing?.address||''}" placeholder="Full address" autocomplete="off"></div>
+    <div class="frow">
+      <div class="fld"><label>Care start date</label><input id="cl-start" type="date" value="${editing?.startDate||''}"></div>
+      <div class="fld"><label>Care end date</label><input id="cl-end" type="date" value="${editing?.endDate||''}"></div>
+    </div>
+    <div class="fld"><label>Care schedule</label><input id="cl-sched" value="${editing?.schedule||''}" placeholder="e.g. Mon-Fri 8am-4pm" autocomplete="off"></div>
+    <div class="fld"><label>Emergency contact name</label><input id="cl-ecname" value="${editing?.ecName||''}" placeholder="Contact name" autocomplete="off"></div>
+    <div class="frow">
+      <div class="fld"><label>Emergency phone</label><input id="cl-ecphone" value="${editing?.ecPhone||''}" placeholder="Phone number" autocomplete="off"></div>
+      <div class="fld"><label>Relationship</label><input id="cl-ecrel" value="${editing?.ecRel||''}" placeholder="e.g. Daughter" autocomplete="off"></div>
+    </div>
+    <div class="fld"><label>Care notes</label><textarea id="cl-notes" placeholder="Special instructions, medical notes...">${editing?.notes||''}</textarea></div>
+    <div class="fld"><label>GPS location</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-o" id="cl-pin-btn" onclick="pinClientLocation()" style="flex:1">&#x1F4CD; Pin location now</button>
+        <div id="cl-pin-status" style="font-size:12px;color:var(--green-t);flex:1;font-variant-numeric:tabular-nums">${editing?.lat?`${editing.lat.toFixed(4)}, ${editing.lng.toFixed(4)}`:''}</div>
+      </div>
+      <div class="hint">Stand at the care address and tap to save GPS coordinates</div>
+    </div>
+    <div id="cl-msg" class="smsg mneu"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" onclick="saveCL()">${editing?'Save changes':'Add client'}</button>
+      ${editing?`<button class="btn btn-o" onclick="S.editCL=null;render()">Cancel</button>`:''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">All clients (${DB.clients.length})</div>
+    ${DB.clients.length?DB.clients.map(cl=>{
+      const as=DB.assignments.find(a=>a.clientId===cl.id);
+      const cg=as?getCaregiver(as.cgId):null;
+      return`<div class="row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="av av-b">${ini(cl.name)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--tx)">${cl.name}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cl.address}</div>
+            <div style="font-size:12px;color:var(--tx3)">${cg?'Caregiver: '+cg.name:'No caregiver assigned'}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editCL('${cl.id}')">&#9998;</button>
+          <button class="btn-icon" style="color:var(--red-t)" onclick="deleteCL('${cl.id}')">&#128465;</button>
+        </div>
+      </div>`;}).join(''):`<div class="empty">No clients added yet</div>`}
+  </div>`;
+  // Restore pinned coords if editing
+  if(editing?.lat){window._clLat=editing.lat;window._clLng=editing.lng;}
+  else{window._clLat=null;window._clLng=null;}
+  return w;
+}
+
+function pinClientLocation(){
+  const btn=$('cl-pin-btn'),st=$('cl-pin-status');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    window._clLat=pos.coords.latitude;window._clLng=pos.coords.longitude;
+    if(st){st.textContent=`${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Pinned! Tap to update';}
+  },err=>{
+    if(st){st.style.color='var(--red-t)';st.textContent=err.code===1?'Permission denied.':'Could not get location.';}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin location now';}
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+}
+
+function saveCL(){
+  const name=($('cl-name').value||'').trim();
+  const address=($('cl-addr').value||'').trim();
+  const startDate=($('cl-start').value||'').trim();
+  const endDate=($('cl-end').value||'').trim();
+  const schedule=($('cl-sched').value||'').trim();
+  const ecName=($('cl-ecname').value||'').trim();
+  const ecPhone=($('cl-ecphone').value||'').trim();
+  const ecRel=($('cl-ecrel').value||'').trim();
+  const notes=($('cl-notes').value||'').trim();
+  if(!name||!address){setMsg('cl-msg','Client name and address are required.','merr');return;}
+  const lat=window._clLat||null;
+  const lng=window._clLng||null;
+  if(!lat){setMsg('cl-msg','Please pin the care location GPS first.','merr');return;}
+  const obj={id:S.editCL?S.editCL.id:uid(),name,address,startDate,endDate,schedule,ecName,ecPhone,ecRel,notes,lat,lng};
+  if(S.editCL){const i=DB.clients.findIndex(c=>c.id===S.editCL.id);if(i>=0)DB.clients[i]=obj;S.editCL=null;}
+  else DB.clients.push(obj);
+  sv(DB);render();
+}
+function editCL(id){S.editCL=DB.clients.find(c=>c.id===id)||null;S.supTab='clients';render();}
+function deleteCL(id){if(!confirm('Delete this client?'))return;DB.clients=DB.clients.filter(c=>c.id!==id);DB.assignments=DB.assignments.filter(a=>a.clientId!==id);sv(DB);render();}
+
+/* Assignments */
+function bSupAssignments(){
+  const w=document.createElement('div');
+  const editing=S.editAS;
+  w.innerHTML=`
+  <div class="card">
+    <div class="sec-label">${editing?'Edit assignment':'New assignment'}</div>
+    <div class="fld"><label>Caregiver</label>
+      <select id="as-cg">
+        <option value="">Select caregiver...</option>
+        ${DB.caregivers.map(c=>`<option value="${c.id}" ${editing?.cgId===c.id?'selected':''}>${c.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="fld"><label>Client</label>
+      <select id="as-cl">
+        <option value="">Select client...</option>
+        ${DB.clients.map(c=>`<option value="${c.id}" ${editing?.clientId===c.id?'selected':''}>${c.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="frow">
+      <div class="fld"><label>Start date</label><input id="as-start" type="date" value="${editing?.startDate||''}"></div>
+      <div class="fld"><label>End date</label><input id="as-end" type="date" value="${editing?.endDate||''}"></div>
+    </div>
+    <div class="fld"><label>Notes (optional)</label><textarea id="as-notes" placeholder="Assignment notes...">${editing?.notes||''}</textarea></div>
+    <div id="as-msg" class="smsg mneu"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" onclick="saveAS()">${editing?'Save changes':'Create assignment'}</button>
+      ${editing?`<button class="btn btn-o" onclick="S.editAS=null;render()">Cancel</button>`:''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec-label">All assignments (${DB.assignments.length})</div>
+    ${DB.assignments.length?DB.assignments.map(as=>{
+      const cg=getCaregiver(as.cgId);
+      const cl=getClient(as.clientId);
+      return`<div class="row">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--tx)">${cg?.name||'?'} &rarr; ${cl?.name||'?'}</div>
+          <div style="font-size:12px;color:var(--tx2)">${as.startDate||'No start'} &ndash; ${as.endDate||'Ongoing'}</div>
+          <div style="font-size:12px;color:var(--tx3)">${cl?.schedule||''}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-icon" onclick="editAS('${as.id}')">&#9998;</button>
+          <button class="btn-icon" style="color:var(--red-t)" onclick="deleteAS('${as.id}')">&#128465;</button>
+        </div>
+      </div>`;}).join(''):`<div class="empty">No assignments yet</div>`}
+  </div>`;
+  return w;
+}
+function saveAS(){
+  const cgId=($('as-cg').value||'').trim();
+  const clientId=($('as-cl').value||'').trim();
+  const startDate=($('as-start').value||'').trim();
+  const endDate=($('as-end').value||'').trim();
+  const notes=($('as-notes').value||'').trim();
+  if(!cgId||!clientId){setMsg('as-msg','Please select both a caregiver and client.','merr');return;}
+  const obj={id:S.editAS?S.editAS.id:uid(),cgId,clientId,startDate,endDate,notes};
+  if(S.editAS){const i=DB.assignments.findIndex(a=>a.id===S.editAS.id);if(i>=0)DB.assignments[i]=obj;S.editAS=null;}
+  else DB.assignments.push(obj);
+  sv(DB);render();
+}
+function editAS(id){S.editAS=DB.assignments.find(a=>a.id===id)||null;S.supTab='assignments';render();}
+function deleteAS(id){if(!confirm('Remove this assignment?'))return;DB.assignments=DB.assignments.filter(a=>a.id!==id);sv(DB);render();}
+
+/* Reports */
+function bSupReports(){
+  const w=document.createElement('div');
+  let html=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem"><div class="sec-label" style="margin:0">All caregiver reports</div><button class="btn-sm" onclick="exportAllCSV()">Export all CSV</button></div>`;
+  if(!DB.caregivers.length){html+=`<div class="empty">No caregivers yet</div>`;}
+  else{
+    DB.caregivers.forEach(cg=>{
+      const todayMs=totMs(cgTodaySessions(cg.id));
+      const weekMs=totMs(cgWeekSessions(cg.id));
+      const allMs=totMs(cgSessions(cg.id).filter(s=>s.outTime));
+      const as=getAssignment(cg.id);
+      const cl=as?getClient(as.clientId):null;
+      html+=`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--bdr)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem">
+          <div class="av av-g">${ini(cg.name)}</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--tx)">${cg.name}</div>
+            <div style="font-size:12px;color:var(--tx2)">${cl?cl.name:'No assignment'}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.75rem">
+          <div class="met"><div class="met-l">Today</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(todayMs)}</div></div>
+          <div class="met"><div class="met-l">This week</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(weekMs)}</div></div>
+          <div class="met"><div class="met-l">All time</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(allMs)}</div></div>
+        </div>`;
+      const sess=cgSessions(cg.id).filter(s=>s.outTime).slice(-5).reverse();
+      if(sess.length){
+        html+=`<div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recent shifts</div>`;
+        sess.forEach((s,i)=>{html+=`<div class="row"><span class="row-label">${fDs(s.inTime)} &nbsp; ${fT2(s.inTime)}&ndash;${fT2(s.outTime)}</span><span class="row-val-g">${fHM(s.outTime-s.inTime)}</span></div>`;});
+      }
+      html+=`</div>`;
+    });
+  }
+  html+=`</div>`;
+  w.innerHTML=html;
+  return w;
+}
+
+function exportAllCSV(){
+  const hdr=['Caregiver','Client','Date','Clock In','Clock Out','Duration (hrs)','Duration (min)'];
+  const rows=[];
+  DB.sessions.filter(s=>s.outTime).forEach(s=>{
+    const cg=getCaregiver(s.cgId);
+    const as=getAssignment(s.cgId);
+    const cl=as?getClient(as.clientId):null;
+    const ms=s.outTime-s.inTime;
+    rows.push([cg?.name||'',cl?.name||'',fDs(s.inTime),fT2(s.inTime),fT2(s.outTime),(ms/3600000).toFixed(2),Math.round(ms/60000)]);
+  });
+  const csv=[hdr,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='care_clock_report.csv';a.click();URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════
+   CAREGIVER VIEW
+═══════════════════════════════════════ */
+function bCaregiver(){
+  const cg=S.currentCG;
+  const as=getAssignment(cg.id);
+  const cl=as?getClient(as.clientId):null;
+  const w=document.createElement('div');
+  w.innerHTML=`
+  <div class="hrow">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="av av-g">${ini(cg.name)}</div>
+      <div>
+        <div style="font-size:17px;font-weight:700;color:var(--tx)">${cg.name}</div>
+        <div style="font-size:13px;color:var(--tx2)">Caregiver</div>
+      </div>
+    </div>
+    <button class="btn-sm" onclick="logout()">Sign out</button>
+  </div>
+  <div class="nav">
+    <button class="nav-tab ${S.cgTab==='clock'?'on':''}" onclick="cgTab('clock')">Clock</button>
+    <button class="nav-tab ${S.cgTab==='assignment'?'on':''}" onclick="cgTab('assignment')">My Assignment</button>
+    <button class="nav-tab ${S.cgTab==='log'?'on':''}" onclick="cgTab('log')">My Hours</button>
+  </div>
+  <div id="cg-content"></div>`;
+  setTimeout(()=>{
+    const c=$('cg-content');if(!c)return;
+    if(S.cgTab==='clock')c.appendChild(bCGClock(cg,cl));
+    else if(S.cgTab==='assignment')c.appendChild(bCGAssignment(cg,as,cl));
+    else if(S.cgTab==='log')c.appendChild(bCGLog(cg));
+  },0);
+  return w;
+}
+function cgTab(t){S.cgTab=t;render();}
+
+/* Caregiver Clock tab */
+function bCGClock(cg,cl){
+  const elapsed=S.clockedIn&&S.clockInTime?Date.now()-S.clockInTime:0;
+  const todayMs=totMs(cgTodaySessions(cg.id));
+
+  let gHtml='';
+  if(!cl){
+    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>You have no active assignment. Please contact your supervisor.</span></div>`;
+  } else if(!cl.lat){
+    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Care location not set yet. Contact your supervisor.</span></div>`;
+  } else if(!S.locChecked){
+    gHtml=`<div class="geo geo-neu"><div class="dot da" style="margin-top:3px;flex-shrink:0"></div><span>Tap below to verify you are at the care location</span></div>`;
+  } else if(S.locOk){
+    gHtml=`<div class="geo geo-ok"><div class="dot dg" style="margin-top:3px;flex-shrink:0"></div><span>You are within range &mdash; ${Math.round(S.locDist)} ft from ${cl.name}'s address</span></div>`;
+  } else {
+    const dist=S.locDist!==null?`You are ${Math.round(S.locDist)} ft away. `:'';
+    gHtml=`<div class="geo geo-fail"><div class="dot dr" style="margin-top:3px;flex-shrink:0"></div><span>${dist}You must be within 100 ft of ${cl?.name||'the care address'} to clock in. Please go to the care location.</span></div>`;
+  }
+
+  const badge=S.clockedIn?`<div class="badge b-green"><div class="dot dg"></div>Clocked in</div>`:`<div class="badge b-red"><div class="dot dr"></div>Clocked out</div>`;
+  const canClock=cl&&cl.lat;
+  const mainBtn=S.clockedIn
+    ?`<button class="btn btn-r" onclick="doClock()">Clock out</button>`
+    :(canClock&&S.locOk)
+      ?`<button class="btn btn-g" onclick="doClock()">Clock in</button>`
+      :`<button class="btn" disabled>${!canClock?'No assignment set':'Must be within 100 ft to clock in'}</button>`;
+
   const w=document.createElement('div');
   w.innerHTML=`
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
       ${badge}
-      <div class="eld" id="eld" style="${S.in?'':'display:none'}">${fEl(elapsed)}</div>
+      <div class="clock-elapsed" id="eld" style="${S.clockedIn?'':'display:none'}">${fEl(elapsed)}</div>
     </div>
-    <div class="tbig" id="cf">${fT(Date.now())}</div>
-    <div class="dsm">${fD(Date.now())}</div>
+    <div class="clock-big" id="cf">${fT(Date.now())}</div>
+    <div class="clock-date">${fD(Date.now())}</div>
     <div class="div"></div>
     ${gHtml}
-    <button class="btn bo" style="margin-bottom:.75rem" id="geo-btn" onclick="checkGeo()">&#x1F4CD; Verify my location</button>
+    ${canClock?`<button class="btn btn-o" style="margin-bottom:.75rem" id="geo-btn" onclick="checkGeo()">&#x1F4CD; Verify my location</button>`:''}
     ${mainBtn}
-    <div class="noti">You must be within 100 ft of ${data.config?.address||'the care address'}</div>
+    ${cl?`<div class="noti">Must be within 100 ft of ${cl.address}</div>`:''}
   </div>
   <div class="card">
-    <div class="lbl">Today at a glance</div>
+    <div class="sec-label">Today at a glance</div>
     <div class="mgrid">
-      <div class="met"><div class="ml">Shifts today</div><div class="mv">${todayS().length}</div></div>
-      <div class="met"><div class="ml">Hours today</div><div class="mv">${fHM(totMs(todayS()))}</div></div>
+      <div class="met"><div class="met-l">Shifts today</div><div class="met-v">${cgTodaySessions(cg.id).length}</div></div>
+      <div class="met"><div class="met-l">Hours today</div><div class="met-v">${fHM(todayMs)}</div></div>
     </div>
+  </div>`;
+  startTick();
+  return w;
+}
+
+/* Caregiver Assignment tab */
+function bCGAssignment(cg,as,cl){
+  const w=document.createElement('div');
+  if(!as||!cl){
+    w.innerHTML=`<div class="card"><div class="empty">You have no active assignment.<br>Please contact your supervisor.</div></div>`;
+    return w;
+  }
+  w.innerHTML=`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+      <div class="av av-b" style="width:48px;height:48px;font-size:16px">${ini(cl.name)}</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:var(--tx)">${cl.name}</div>
+        <div class="badge b-green" style="margin-top:4px">Active assignment</div>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="sec-label">Client information</div>
+    <div class="info-row"><div class="info-key">Address</div><div class="info-val">${cl.address}</div></div>
+    <div class="info-row"><div class="info-key">Schedule</div><div class="info-val">${cl.schedule||'Not specified'}</div></div>
+    <div class="info-row"><div class="info-key">Assignment start</div><div class="info-val">${as.startDate||'Not set'}</div></div>
+    <div class="info-row"><div class="info-key">Assignment end</div><div class="info-val">${as.endDate||'Ongoing'}</div></div>
+    ${cl.notes?`<div class="info-row"><div class="info-key">Care notes</div><div class="info-val">${cl.notes}</div></div>`:''}
+  </div>
+  <div class="card">
+    <div class="sec-label">Emergency contact</div>
+    ${cl.ecName?`
+    <div class="info-row"><div class="info-key">Name</div><div class="info-val">${cl.ecName}</div></div>
+    <div class="info-row"><div class="info-key">Phone</div><div class="info-val"><a href="tel:${cl.ecPhone}" style="color:var(--blue)">${cl.ecPhone}</a></div></div>
+    <div class="info-row"><div class="info-key">Relationship</div><div class="info-val">${cl.ecRel||'Not specified'}</div></div>
+    `:`<div class="empty">No emergency contact on file</div>`}
   </div>`;
   return w;
 }
 
-/* ── LOG TAB ── */
-function bLog(){
-  const sess=todayS(),total=totMs(sess);
-  const tRows=sess.length?sess.map((s,i)=>`<div class="lrow"><span class="ll">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime)}</span><span class="lv">${fHM(s.outTime-s.inTime)}</span></div>`).join(''):`<div class="emp">No shifts recorded today</div>`;
-  const totHtml=sess.length?`<div class="div"></div><div class="trow"><span style="font-size:14px;font-weight:600;color:var(--tx2)">Total today</span><span style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(total)}</span></div>`:'';
-  const week=weekS(),wt=totMs(week),gr={};
-  week.forEach(s=>{const d=fDs(s.inTime);(gr[d]=gr[d]||[]).push(s);});
-  const wHtml=week.length?Object.entries(gr).map(([day,ss])=>`<div class="wdl">${day}</div>${ss.map((s,i)=>`<div class="lrow"><span class="ll">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime)}</span><span class="lv">${fHM(s.outTime-s.inTime)}</span></div>`).join('')}`).join(''):`<div class="emp">No shifts this week</div>`;
+/* Caregiver Log tab */
+function bCGLog(cg){
+  const todaySess=cgTodaySessions(cg.id);
+  const weekSess=cgWeekSessions(cg.id);
+  const allSess=cgSessions(cg.id).filter(s=>s.outTime);
+  const todayTotal=totMs(todaySess);
+  const weekTotal=totMs(weekSess);
+  const allTotal=totMs(allSess);
+  const todayRows=todaySess.length?todaySess.map((s,i)=>`<div class="row"><span class="row-label">Shift ${i+1} &nbsp; ${fT2(s.inTime)} &ndash; ${fT2(s.outTime||Date.now())}</span><span class="row-val-g">${fHM((s.outTime||Date.now())-s.inTime)}</span></div>`).join(''):`<div class="empty">No shifts today</div>`;
+  const gr={};
+  weekSess.forEach(s=>{const d=fDs(s.inTime);(gr[d]=gr[d]||[]).push(s);});
+  const weekRows=weekSess.length?Object.entries(gr).map(([day,ss])=>`<div class="wdl">${day}</div>${ss.map((s,i)=>`<div class="row"><span class="row-label">Shift ${i+1} &nbsp; ${fT2(s.inTime)}&ndash;${fT2(s.outTime||Date.now())}</span><span class="row-val-g">${fHM((s.outTime||Date.now())-s.inTime)}</span></div>`).join('')}`).join(''):`<div class="empty">No shifts this week</div>`;
   const w=document.createElement('div');
   w.innerHTML=`
-  <div class="card"><div class="lbl">Today's log</div>${tRows}${totHtml}</div>
+  <div class="card">
+    <div class="sec-label">Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:.5rem">
+      <div class="met"><div class="met-l">Today</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(todayTotal)}</div></div>
+      <div class="met"><div class="met-l">This week</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(weekTotal)}</div></div>
+      <div class="met"><div class="met-l">All time</div><div style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(allTotal)}</div></div>
+    </div>
+  </div>
+  <div class="card"><div class="sec-label">Today's shifts</div>${todayRows}</div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
-      <div class="lbl" style="margin:0">This week</div>
-      <span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(wt)}</span>
+      <div class="sec-label" style="margin:0">This week</div>
+      <span style="font-size:14px;font-weight:700;color:var(--green)">${fHM(weekTotal)}</span>
     </div>
-    ${wHtml}
+    ${weekRows}
   </div>`;
   return w;
 }
 
-/* ── SHEET TAB ── */
-function bSheet(){
-  const sess=data.sessions.slice().reverse(),total=totMs(data.sessions);
-  const rows=sess.length?sess.map(s=>`<tr><td>${fDs(s.inTime)}</td><td>${fT2(s.inTime)}</td><td>${fT2(s.outTime)}</td><td style="font-weight:700;color:var(--green)">${fHM(s.outTime-s.inTime)}</td></tr>`).join(''):`<tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:2rem">No sessions yet</td></tr>`;
-  const w=document.createElement('div');
-  w.innerHTML=`
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem">
-      <div class="lbl" style="margin:0">All shifts</div>
-      <button class="bsm" onclick="exportCSV()">Export CSV</button>
-    </div>
-    <div class="sscr">
-      <table class="stbl">
-        <thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hours</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-    ${sess.length?`<div class="div"></div><div class="trow"><span style="font-size:14px;font-weight:600;color:var(--tx2)">All-time total</span><span style="font-size:16px;font-weight:700;color:var(--tx)">${fHM(total)}</span></div>`:''}
-  </div>`;
-  return w;
-}
-
-/* ── TICK ── */
-function startTick(){
-  S.timer=setInterval(()=>{
-    const cf=$('cf');if(cf)cf.textContent=fT(Date.now());
-    const ed=$('eld');if(ed&&S.in&&S.inTime)ed.textContent=fEl(Date.now()-S.inTime);
-  },1000);
-}
-
-/* ── ADMIN FUNCTIONS ── */
-function openAdmin(){S.showAdmin=true;S.adminAuth=false;render();}
-function closeAdmin(){S.showAdmin=false;S.adminAuth=false;render();}
-
-function checkAdminPass(){
-  const pw=$('adm-pw').value;
-  const stored=data.config?.adminPass||ADMIN_PASS;
-  if(pw===stored){S.adminAuth=true;render();}
-  else{const m=$('adm-msg');if(m){m.textContent='Incorrect password. Try again.';}}
-}
-
-function adminPin(){
-  const btn=$('apin-btn'),st=$('apin-status');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
-  if(st){st.style.color='var(--tx3)';st.textContent='Locating...';}
-  if(!navigator.geolocation){
-    if(st){st.style.color='var(--red-t)';st.textContent='Geolocation not supported.';}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin care location now';}
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(pos=>{
-    window._adminPinLat=pos.coords.latitude;
-    window._adminPinLng=pos.coords.longitude;
-    if(st){st.style.color='var(--green-t)';st.textContent=`Pinned: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Location pinned! Tap again to update';}
-  },err=>{
-    const msg=err.code===1?'Permission denied. Allow location access.':'Could not get location. Try again.';
-    if(st){st.style.color='var(--red-t)';st.textContent=msg;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin care location now';}
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
-}
-
-function adminRepin(){
-  const btn=$('repin-btn'),st=$('repin-status');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    if(data.config){data.config.lat=pos.coords.latitude;data.config.lng=pos.coords.longitude;save(data);}
-    S.locChecked=false;S.locOk=false;
-    if(st){st.textContent=`Updated: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Re-pinned! Tap again to update';}
-  },err=>{
-    if(st){st.style.color='var(--red-t)';st.textContent=err.code===1?'Permission denied.':'Could not get location.';}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Re-pin care location';}
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
-}
-
-function adminSave(){
-  const f=$('af').value.trim(),c=$('ac').value.trim(),a=$('aa').value.trim(),p=$('ap').value.trim();
-  if(!f||!c||!a){setMsg('as-msg','Please fill in all fields.','merr');return;}
-  if(!window._adminPinLat){setMsg('as-msg','Please pin the care location first.','merr');return;}
-  data.config={
-    familyName:f,caregiverName:c,address:a,
-    lat:window._adminPinLat,lng:window._adminPinLng,
-    adminPass:p||ADMIN_PASS
-  };
-  save(data);S.view='main';S.tab='clock';render();
-}
-
-function adminUpdate(){
-  const f=$('cfg-f').value.trim(),c=$('cfg-c').value.trim(),a=$('cfg-a').value.trim(),p=$('cfg-p').value.trim();
-  if(!f||!c||!a){setMsg('cfg-msg','Please fill in all fields.','merr');return;}
-  data.config={...data.config,familyName:f,caregiverName:c,address:a};
-  if(p)data.config.adminPass=p;
-  save(data);
-  S.locChecked=false;S.locOk=false;
-  setMsg('cfg-msg','Saved!','mok');
-  setTimeout(()=>{closeAdmin();},800);
-}
-
-function adminClearSessions(){
-  if(!confirm('Delete ALL shift records? This cannot be undone.'))return;
-  data.sessions=[];save(data);
-  setMsg('cfg-msg','All shift data cleared.','mok');
-  setTimeout(()=>{closeAdmin();},800);
-}
-
-/* ── GEOLOCATION CHECK ── */
+/* ── CLOCK IN / OUT ── */
 function checkGeo(){
   const btn=$('geo-btn');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting location...';}
-  if(!navigator.geolocation){S.locChecked=true;S.locOk=false;S.locErr='Geolocation not supported on this device.';render();return;}
-  if(!data.config?.lat){S.locChecked=true;S.locOk=false;S.locErr='No care location set. Contact your supervisor.';render();return;}
+  const as=getAssignment(S.currentCG?.id);
+  const cl=as?getClient(as.clientId):null;
+  if(!cl?.lat){S.locChecked=true;S.locOk=false;S.locErr='No location set for this client.';render();return;}
   navigator.geolocation.getCurrentPosition(
     pos=>{
-      const d=distFt(pos.coords.latitude,pos.coords.longitude,data.config.lat,data.config.lng);
-      S.locChecked=true;S.locDist=d;S.locOk=d<=MAX_DIST_FT;S.locErr=null;
-      render();
+      const d=distFt(pos.coords.latitude,pos.coords.longitude,cl.lat,cl.lng);
+      S.locChecked=true;S.locDist=d;S.locOk=d<=100;S.locErr=null;render();
     },
     err=>{
       S.locChecked=true;S.locOk=false;S.locDist=null;
-      S.locErr=err.code===1?'Location permission denied. Please allow location access in your browser settings.':'Could not get your location. Please try again.';
+      S.locErr=err.code===1?'Location permission denied.':'Could not get location. Try again.';
       render();
     },
     {enableHighAccuracy:true,timeout:12000,maximumAge:30000}
   );
 }
 
-/* ── CLOCK IN / OUT ── */
 function doClock(){
-  if(S.in){data.sessions.push({inTime:S.inTime,outTime:Date.now()});save(data);S.in=false;S.inTime=null;}
-  else{S.in=true;S.inTime=Date.now();}
+  const cg=S.currentCG;
+  if(S.clockedIn){
+    // Clock out
+    const i=DB.sessions.findIndex(s=>s.id===S.openSessionId);
+    if(i>=0)DB.sessions[i].outTime=Date.now();
+    sv(DB);S.clockedIn=false;S.clockInTime=null;S.openSessionId=null;
+  } else {
+    // Clock in
+    const session={id:uid(),cgId:cg.id,inTime:Date.now(),outTime:null};
+    DB.sessions.push(session);sv(DB);
+    S.clockedIn=true;S.clockInTime=session.inTime;S.openSessionId=session.id;
+  }
   render();
 }
 
-/* ── EXPORT CSV ── */
-function exportCSV(){
-  const hdr=['Date','Clock In','Clock Out','Duration (hrs)','Duration (min)'];
-  const rows=data.sessions.map(s=>{const ms=s.outTime-s.inTime;return[fDs(s.inTime),fT2(s.inTime),fT2(s.outTime),(ms/3600000).toFixed(2),Math.round(ms/60000)];});
-  const csv=[hdr,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`${(data.config?.caregiverName||'caregiver').replace(/\s+/g,'_')}_timesheet.csv`;a.click();URL.revokeObjectURL(url);
+function startTick(){
+  clearInterval(S.timer);
+  S.timer=setInterval(()=>{
+    const cf=$('cf');if(cf)cf.textContent=fT(Date.now());
+    const ed=$('eld');if(ed&&S.clockedIn&&S.clockInTime)ed.textContent=fEl(Date.now()-S.clockInTime);
+  },1000);
+}
+
+function logout(){
+  clearInterval(S.timer);
+  S.view='login';S.currentCG=null;S.clockedIn=false;S.clockInTime=null;
+  S.locOk=false;S.locChecked=false;S.locDist=null;
+  render();
 }
 
 render();
