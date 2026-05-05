@@ -433,12 +433,14 @@ function buildSupCL(){
   const listRows=DB.clients.length?DB.clients.map(cl=>{
     const as=DB.assignments.find(a=>a.clientId===cl.id);
     const cg=as?getCG(as.cgId):null;
+    const fullAddr=[cl.street,cl.apt,cl.city,cl.state,cl.zip].filter(Boolean).join(', ');
+    const displayName=(cl.firstName||'')+' '+(cl.lastName||'');
     return`<div class="row">
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="av av-b">${ini(cl.name)}</div>
+        <div class="av av-b">${ini(displayName.trim()||cl.name)}</div>
         <div>
-          <div style="font-size:14px;font-weight:600;color:var(--tx)">${cl.name}</div>
-          <div style="font-size:12px;color:var(--tx2)">${cl.address}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--tx)">${displayName.trim()||cl.name||''}</div>
+          <div style="font-size:12px;color:var(--tx2)">${fullAddr||cl.address||''}</div>
           <div style="font-size:12px;color:var(--tx3)">${cg?'Caregiver: '+cg.name:'Unassigned'}</div>
         </div>
       </div>
@@ -450,29 +452,52 @@ function buildSupCL(){
   return`
   <div class="card">
     <div class="sec-label">${ed?'Edit client':'Add new client'}</div>
-    <div class="fld"><label>Client full name</label><input id="cl-n" value="${ed?.name||''}" placeholder="Full name" autocomplete="off"></div>
-    <div class="fld"><label>Care address</label><input id="cl-a" value="${ed?.address||''}" placeholder="Full street address" autocomplete="off"></div>
+    <div class="frow">
+      <div class="fld"><label>First name</label><input id="cl-fn" value="${ed?.firstName||''}" placeholder="First name" autocomplete="off"></div>
+      <div class="fld"><label>Last name</label><input id="cl-ln" value="${ed?.lastName||''}" placeholder="Last name" autocomplete="off"></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec-label">Care address</div>
+    <div class="fld"><label>Street address</label><input id="cl-str" value="${ed?.street||''}" placeholder="e.g. 9304 Forest Lane" autocomplete="off"></div>
+    <div class="fld"><label>Unit / Apt (optional)</label><input id="cl-apt" value="${ed?.apt||''}" placeholder="Apt, Suite, Unit..." autocomplete="off"></div>
+    <div class="frow">
+      <div class="fld"><label>City</label><input id="cl-cty" value="${ed?.city||''}" placeholder="City" autocomplete="off"></div>
+      <div class="fld"><label>State</label><input id="cl-sta" value="${ed?.state||''}" placeholder="TX" maxlength="2" style="text-transform:uppercase" autocomplete="off"></div>
+    </div>
+    <div class="frow">
+      <div class="fld"><label>ZIP code</label><input id="cl-zip" value="${ed?.zip||''}" placeholder="75243" maxlength="10" autocomplete="off"></div>
+      <div class="fld"></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec-label">Assignment dates &amp; schedule</div>
     <div class="frow">
       <div class="fld"><label>Start date</label><input id="cl-sd" type="date" value="${ed?.startDate||''}"></div>
       <div class="fld"><label>End date</label><input id="cl-ed" type="date" value="${ed?.endDate||''}"></div>
     </div>
-    <div class="fld"><label>Care schedule</label><input id="cl-sc" value="${ed?.schedule||''}" placeholder="e.g. Mon-Fri 8am-4pm" autocomplete="off"></div>
+    <div class="fld"><label>Care schedule</label><input id="cl-sc" value="${ed?.schedule||''}" placeholder="e.g. Monday-Friday 8:00am-4:00pm" autocomplete="off"></div>
     <div class="div"></div>
     <div class="sec-label">Emergency contact</div>
-    <div class="fld"><label>Contact name</label><input id="cl-ecn" value="${ed?.ecName||''}" placeholder="Full name" autocomplete="off"></div>
     <div class="frow">
-      <div class="fld"><label>Phone number</label><input id="cl-ecp" value="${ed?.ecPhone||''}" placeholder="Phone" autocomplete="off"></div>
+      <div class="fld"><label>First name</label><input id="cl-ecfn" value="${ed?.ecFirstName||''}" placeholder="First name" autocomplete="off"></div>
+      <div class="fld"><label>Last name</label><input id="cl-ecln" value="${ed?.ecLastName||''}" placeholder="Last name" autocomplete="off"></div>
+    </div>
+    <div class="frow">
+      <div class="fld"><label>Phone number</label><input id="cl-ecp" value="${ed?.ecPhone||''}" placeholder="(000) 000-0000" autocomplete="off"></div>
       <div class="fld"><label>Relationship</label><input id="cl-ecr" value="${ed?.ecRel||''}" placeholder="e.g. Daughter" autocomplete="off"></div>
     </div>
-    <div class="fld"><label>Care notes</label><textarea id="cl-nt" placeholder="Special instructions, medical info...">${ed?.notes||''}</textarea></div>
+    <div class="fld"><label>Emergency contact email (optional)</label><input id="cl-ecem" type="email" value="${ed?.ecEmail||''}" placeholder="email@example.com" autocomplete="off"></div>
+    <div class="div"></div>
+    <div class="sec-label">Care notes</div>
+    <div class="fld"><textarea id="cl-nt" placeholder="Special instructions, medical info, preferences...">${ed?.notes||''}</textarea></div>
     <div class="div"></div>
     <div class="fld">
       <label>GPS location</label>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
-        <button class="btn btn-o" id="cl-pin-btn" onclick="window.pinCL()" style="flex:none;width:auto;padding:8px 14px;font-size:13px">&#x1F4CD; Pin location</button>
-        <span id="cl-pin-st" style="font-size:12px;color:var(--green-t);font-variant-numeric:tabular-nums">${ed?.lat?`Pinned: ${ed.lat.toFixed(4)}, ${ed.lng.toFixed(4)}`:''}</span>
+      <div style="background:var(--bg);border-radius:var(--rs);padding:.875rem;margin-bottom:4px">
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:.75rem">GPS is looked up automatically from the address fields above. Fill in the address first, then tap the button below.</div>
+        <button class="btn btn-b" id="cl-geo-btn" onclick="window.geocodeCL()">&#x1F4CD; Look up GPS from address</button>
+        <div id="cl-geo-st" style="font-size:12px;min-height:18px;margin-top:8px;font-variant-numeric:tabular-nums;color:var(--green-t)">${ed?.lat?'&#x2713; GPS set: '+ed.lat.toFixed(5)+', '+ed.lng.toFixed(5):''}</div>
       </div>
-      <div class="hint">Go to the care address and tap Pin to save GPS. Caregiver must be within 100 ft to clock in.</div>
+      <div class="hint">Caregiver must be within 100 ft of this location to clock in.</div>
     </div>
     <div id="cl-msg" class="smsg mneu"></div>
     <div style="display:flex;gap:8px">
@@ -489,27 +514,65 @@ function buildSupCL(){
 window.editCL=function(id){EDIT_CL=DB.clients.find(c=>c.id===id)||null;SUP_TAB='clients';render();};
 window.cancelEditCL=function(){EDIT_CL=null;render();};
 
-window.pinCL=function(){
-  const btn=$('cl-pin-btn'),st=$('cl-pin-st');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Getting GPS...';}
-  navigator.geolocation.getCurrentPosition(pos=>{
-    window._clLat=pos.coords.latitude;window._clLng=pos.coords.longitude;
-    if(st){st.style.color='var(--green-t)';st.textContent=`Pinned: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x2713; Pinned!';}
-  },err=>{
-    if(st){st.style.color='var(--red-t)';st.textContent=err.code===1?'Permission denied.':'Could not get location.';}
-    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Pin location';}
-  },{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+window.geocodeCL=async function(){
+  const street=($('cl-str').value||'').trim();
+  const city=($('cl-cty').value||'').trim();
+  const state=($('cl-sta').value||'').trim();
+  const zip=($('cl-zip').value||'').trim();
+  if(!street||!city||!state){
+    const st=$('cl-geo-st');
+    if(st){st.style.color='var(--red-t)';st.textContent='Please fill in Street, City and State first.';}
+    return;
+  }
+  const btn=$('cl-geo-btn'),st=$('cl-geo-st');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>Looking up address...';}
+  if(st){st.style.color='var(--tx3)';st.textContent='Searching...';}
+  const fullAddr=`${street}, ${city}, ${state}${zip?' '+zip:''}`;
+  // Try multiple variants for reliability
+  const variants=[fullAddr,`${street}, ${city}, ${state}`,`${street} ${city} ${state} ${zip}`];
+  let found=false;
+  for(const v of variants){
+    try{
+      const url=`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(v)}&limit=1&countrycodes=us`;
+      const r=await fetch(url,{headers:{'Accept-Language':'en-US'}});
+      const j=await r.json();
+      if(j&&j.length){
+        window._clLat=parseFloat(j[0].lat);window._clLng=parseFloat(j[0].lon);
+        if(st){st.style.color='var(--green-t)';st.innerHTML='&#x2713; GPS found: '+window._clLat.toFixed(5)+', '+window._clLng.toFixed(5)+' &mdash; <em>'+j[0].display_name.split(',').slice(0,3).join(',')+'</em>';}
+        if(btn){btn.disabled=false;btn.innerHTML='&#x2713; GPS set! Tap to update';}
+        found=true;break;
+      }
+    }catch(e){}
+  }
+  if(!found){
+    if(st){st.style.color='var(--red-t)';st.textContent='Address not found. Check the address fields and try again.';}
+    if(btn){btn.disabled=false;btn.innerHTML='&#x1F4CD; Look up GPS from address';}
+  }
 };
 
 window.saveCL=async function(){
-  const name=($('cl-n').value||'').trim();
-  const address=($('cl-a').value||'').trim();
-  if(!name||!address){setMsg('cl-msg','Name and address are required.','merr');return;}
-  if(!window._clLat){setMsg('cl-msg','Please pin the GPS location first.','merr');return;}
-  const data={name,address,startDate:$('cl-sd').value||'',endDate:$('cl-ed').value||'',
-    schedule:$('cl-sc').value||'',ecName:$('cl-ecn').value||'',ecPhone:$('cl-ecp').value||'',
-    ecRel:$('cl-ecr').value||'',notes:$('cl-nt').value||'',lat:window._clLat,lng:window._clLng,updatedAt:Date.now()};
+  const firstName=($('cl-fn').value||'').trim();
+  const lastName=($('cl-ln').value||'').trim();
+  const street=($('cl-str').value||'').trim();
+  const apt=($('cl-apt').value||'').trim();
+  const city=($('cl-cty').value||'').trim();
+  const state=($('cl-sta').value||'').trim().toUpperCase();
+  const zip=($('cl-zip').value||'').trim();
+  if(!firstName||!lastName){setMsg('cl-msg','First and last name are required.','merr');return;}
+  if(!street||!city||!state){setMsg('cl-msg','Street address, city and state are required.','merr');return;}
+  if(!window._clLat){setMsg('cl-msg','Please look up the GPS location first using the button above.','merr');return;}
+  const fullAddress=[street,apt,city,state,zip].filter(Boolean).join(', ');
+  const data={
+    firstName,lastName,name:firstName+' '+lastName,
+    street,apt,city,state,zip,address:fullAddress,
+    startDate:$('cl-sd').value||'',endDate:$('cl-ed').value||'',
+    schedule:$('cl-sc').value||'',
+    ecFirstName:$('cl-ecfn').value||'',ecLastName:$('cl-ecln').value||'',
+    ecName:($('cl-ecfn').value||'')+' '+($('cl-ecln').value||''),
+    ecPhone:$('cl-ecp').value||'',ecRel:$('cl-ecr').value||'',ecEmail:$('cl-ecem').value||'',
+    notes:$('cl-nt').value||'',
+    lat:window._clLat,lng:window._clLng,updatedAt:Date.now()
+  };
   showLoading('cl-msg','Saving client...');
   try{
     if(EDIT_CL){await fsSet('clients',EDIT_CL.id,data);EDIT_CL=null;}
@@ -720,7 +783,8 @@ function buildCGAssignment(cg,as,cl){
     </div>
     <div class="div"></div>
     <div class="sec-label">Client information</div>
-    <div class="info-row"><div class="info-key">Address</div><div class="info-val">${cl.address}</div></div>
+    <div class="info-row"><div class="info-key">Street</div><div class="info-val">${[cl.street,cl.apt].filter(Boolean).join(', ')||cl.address||'Not set'}</div></div>
+    <div class="info-row"><div class="info-key">City / State / ZIP</div><div class="info-val">${[cl.city,cl.state,cl.zip].filter(Boolean).join(', ')||'-'}</div></div>
     <div class="info-row"><div class="info-key">Schedule</div><div class="info-val">${cl.schedule||'Not specified'}</div></div>
     <div class="info-row"><div class="info-key">Start date</div><div class="info-val">${as.startDate||'Not set'}</div></div>
     <div class="info-row"><div class="info-key">End date</div><div class="info-val">${as.endDate||'Ongoing'}</div></div>
