@@ -78,7 +78,7 @@ const fsAdd=async(c,d)=>{const r=await addDoc(collection(db,c),d);return r.id;};
 const fsDel=async(c,i)=>{try{await deleteDoc(doc(db,c,i));}catch(e){}};
 const fsAll=async(c)=>{try{const s=await getDocs(collection(db,c));return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}};
 const fsQ=async(c,f,op,v)=>{try{const q=query(collection(db,c),where(f,op,v));const s=await getDocs(q);return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}};
-const S={view:'loading',stab:'dash',ctab:'clock',user:null,role:null,cgp:null,isSup:false,eCG:null,eCL:null,eAS:null,lOk:false,lChk:false,lDist:null,lErr:null,cIn:false,cTime:null,cSid:null,tick:null,autoTick:null,locLogs:[],DB:{cgs:[],cls:[],ass:[],sess:[]}};
+const S={view:'loading',stab:'dash',ctab:'clock',user:null,role:null,cgp:null,isSup:false,eCG:null,eCL:null,eAS:null,eTask:null,lOk:false,lChk:false,lDist:null,lErr:null,cIn:false,cTime:null,cSid:null,tick:null,autoTick:null,locLogs:[],DB:{cgs:[],cls:[],ass:[],sess:[],tasks:[]}};
 const $=id=>document.getElementById(id);
 const ini=n=>(n||'?').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -188,13 +188,14 @@ window.appSetup=async function(){
 };
 
 function bSup(){
-  const tabs=[['dash','Dashboard'],['cgs','Caregivers'],['cls','Clients'],['ass','Assign'],['rep','Reports']];
+  const tabs=[['dash','Dashboard'],['cgs','Caregivers'],['cls','Clients'],['ass','Assign'],['tasks','Care Plans'],['rep','Reports']];
   const nav=tabs.map(([t,l])=>`<button class="nt ${S.stab===t?'on':''}" onclick="window.appStab('${t}')">${l}</button>`).join('');
   let body='';
   if(S.stab==='dash')body=bDash();
   else if(S.stab==='cgs')body=bCGs();
   else if(S.stab==='cls')body=bCLs();
   else if(S.stab==='ass')body=bASS();
+  else if(S.stab==='tasks')body=bTasks();
   else if(S.stab==='rep')body=bRep();
   return`<div class="hr"><div><div style="font-size:19px;font-weight:700">Supervisor Portal</div><div style="font-size:12px;color:var(--t2)">Care Clock</div></div><button class="bsm" onclick="window.appLogout()">Sign out</button></div><div class="nav">${nav}</div>${body}`;
 }
@@ -272,6 +273,103 @@ window.appSaveAS=async function(){
 };
 window.appDelAS=async function(id){if(!confirm('Remove?'))return;await fsDel('assignments',id);await loadDB();render();};
 
+function bTasks(){
+  const ed=S.eTask;
+  // Group tasks by client
+  const byClient={};
+  S.DB.tasks.forEach(t=>{(byClient[t.clientId]=byClient[t.clientId]||[]).push(t);});
+
+  const clientOptions=S.DB.cls.map(cl=>`<option value="${cl.id}"${ed?.clientId===cl.id?' selected':''}>${cl.name}</option>`).join('');
+
+  const list=S.DB.cls.length?S.DB.cls.map(cl=>{
+    const tasks=(byClient[cl.id]||[]).sort((a,b)=>(a.order||0)-(b.order||0));
+    return`<div style="margin-bottom:1rem">
+      <div style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">
+        <span>${cl.name}</span>
+        <span style="font-size:11px;color:var(--t3)">${tasks.length} task${tasks.length!==1?'s':''}</span>
+      </div>
+      ${tasks.length?tasks.map((t,i)=>`<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1)">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--tx)">${t.title}</div>
+          ${t.desc?`<div style="font-size:12px;color:var(--t2);margin-top:2px;line-height:1.5">${t.desc}</div>`:''}
+          ${t.freq?`<div style="font-size:11px;color:var(--t3);margin-top:2px">&#128197; ${t.freq}</div>`:''}
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="bic" onclick="window.appEditTask('${t.id}')">&#9998;</button>
+          <button class="bic" style="color:var(--rt)" onclick="window.appDelTask('${t.id}')">&#128465;</button>
+        </div>
+      </div>`).join(''):`<div style="font-size:12px;color:var(--t3);padding:.5rem 0">No tasks yet for this client.</div>`}
+    </div>`;
+  }).join('<div class="div"></div>'):`<div class="empty">Add clients first, then create care plans for them.</div>`;
+
+  return`<div class="card">
+    <div class="sl">${ed?'Edit task':'Add care task'}</div>
+    <div class="fld"><label>Client</label>
+      <select id="tk-cl"><option value="">Select client...</option>${clientOptions}</select>
+    </div>
+    <div class="fld"><label>Task title</label>
+      <input id="tk-title" value="${ed?.title||''}" placeholder="e.g. Check bed pads are dry" autocomplete="off">
+    </div>
+    <div class="fld"><label>Task details / instructions</label>
+      <textarea id="tk-desc" placeholder="Detailed instructions for the caregiver...">${ed?.desc||''}</textarea>
+    </div>
+    <div class="fr">
+      <div class="fld"><label>Frequency</label>
+        <select id="tk-freq">
+          <option value="">Select...</option>
+          <option value="Every visit"${ed?.freq==='Every visit'?' selected':''}>Every visit</option>
+          <option value="Daily"${ed?.freq==='Daily'?' selected':''}>Daily</option>
+          <option value="Every 2-3 days"${ed?.freq==='Every 2-3 days'?' selected':''}>Every 2-3 days</option>
+          <option value="Weekly"${ed?.freq==='Weekly'?' selected':''}>Weekly</option>
+          <option value="As needed"${ed?.freq==='As needed'?' selected':''}>As needed</option>
+        </select>
+      </div>
+      <div class="fld"><label>Category</label>
+        <select id="tk-cat">
+          <option value="">Select...</option>
+          <option value="Personal care"${ed?.cat==='Personal care'?' selected':''}>Personal care</option>
+          <option value="Medication"${ed?.cat==='Medication'?' selected':''}>Medication</option>
+          <option value="Meals"${ed?.cat==='Meals'?' selected':''}>Meals</option>
+          <option value="Household"${ed?.cat==='Household'?' selected':''}>Household</option>
+          <option value="Mobility"${ed?.cat==='Mobility'?' selected':''}>Mobility</option>
+          <option value="Other"${ed?.cat==='Other'?' selected':''}>Other</option>
+        </select>
+      </div>
+    </div>
+    <div id="tk-msg" class="msg mneu"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btng" onclick="window.appSaveTask()">${ed?'Save changes':'Add task'}</button>
+      ${ed?'<button class="btn btno" onclick="window.appCancelTask()">Cancel</button>':''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="sl">All care plans (${S.DB.tasks.length} tasks)</div>
+    ${list}
+  </div>`;
+}
+
+window.appEditTask=function(id){S.eTask=S.DB.tasks.find(t=>t.id===id)||null;S.stab='tasks';render();};
+window.appCancelTask=function(){S.eTask=null;render();};
+window.appSaveTask=async function(){
+  const clientId=($('tk-cl')?.value||'').trim();
+  const title=($('tk-title')?.value||'').trim();
+  const desc=($('tk-desc')?.value||'').trim();
+  const freq=($('tk-freq')?.value||'').trim();
+  const cat=($('tk-cat')?.value||'').trim();
+  if(!clientId||!title){sm('tk-msg','Client and task title are required.','merr');return;}
+  sm('tk-msg',sp('Saving...'),'mneu');
+  const d={clientId,title,desc,freq,cat,updatedAt:Date.now()};
+  try{
+    if(S.eTask){await fsSet('tasks',S.eTask.id,d);S.eTask=null;}
+    else{d.createdAt=Date.now();d.order=S.DB.tasks.filter(t=>t.clientId===clientId).length;await fsAdd('tasks',d);}
+    await loadDB();render();
+  }catch(e){sm('tk-msg','Error: '+e.message,'merr');}
+};
+window.appDelTask=async function(id){
+  if(!confirm('Delete this task?'))return;
+  await fsDel('tasks',id);await loadDB();render();
+};
+
 function bRep(){
   let h=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem"><div class="sl" style="margin:0">All caregiver reports</div><button class="bsm" onclick="window.appExport()">Export CSV</button></div>`;
   if(!S.DB.cgs.length){h+=`<div class="empty">No caregivers yet</div>`;}
@@ -310,11 +408,12 @@ window.appExport=function(){const h=['Caregiver','Client','Date','In','Out','Hrs
 
 function bCG(){
   const cg=S.cgp,as=getAS(cg.id),cl=as?getCL(as.clientId):null;
-  const tabs=[['clock','Clock'],['assign','Assignment'],['hours','My Hours']];
+  const tabs=[['clock','Clock'],['assign','Assignment'],['tasks','Care Tasks'],['hours','My Hours']];
   const nav=tabs.map(([t,l])=>`<button class="nt ${S.ctab===t?'on':''}" onclick="window.appCtab('${t}')">${l}</button>`).join('');
   let body='';
   if(S.ctab==='clock')body=bCGClock(cg,cl);
   else if(S.ctab==='assign')body=bCGAssign(cg,as,cl);
+  else if(S.ctab==='tasks')body=bCGTasks(cg,cl);
   else if(S.ctab==='hours')body=bCGHours(cg);
   return`<div class="hr"><div style="display:flex;align-items:center;gap:10px"><div class="av avg">${ini(cg.name)}</div><div><div style="font-size:17px;font-weight:700">${cg.name}</div><div style="font-size:12px;color:var(--t2)">${cl?'Client: '+cl.name:'No assignment'}</div></div></div><button class="bsm" onclick="window.appLogout()">Sign out</button></div><div class="nav">${nav}</div>${body}`;
 }
@@ -332,6 +431,27 @@ function bCGClock(cg,cl){
   const canC=!!(cl?.lat);
   const mb=S.cIn?`<button class="btn btnr" onclick="window.appClock()">Clock out</button>`:(canC&&S.lOk)?`<button class="btn btng" onclick="window.appClock()">Clock in</button>`:`<button class="btn" disabled>${!canC?'No assignment':'Must be within 100 ft'}</button>`;
   return`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">${badge}<div class="cel" id="cel" style="${S.cIn?'':'display:none'}">${fEl(el)}</div></div><div class="cbig" id="cface">${fT(Date.now())}</div><div class="cdate">${fD(Date.now())}</div><div class="div"></div>${geo}${canC?`<button class="btn btno" style="margin-bottom:.75rem" id="loc-btn" onclick="window.appCheckLoc()">&#x1F4CD; Verify my location</button>`:''} ${mb}${cl?`<div class="noti">Must be within ${cl.radiusFt||100} ft of ${[cl.street,cl.city,cl.state].filter(Boolean).join(', ')||cl.address||'care address'}</div>`:''}</div><div class="card"><div class="sl">Today</div><div class="mg"><div class="met"><div class="ml">Shifts</div><div class="mv">${tdS(cg.id).length}</div></div><div class="met"><div class="ml">Hours</div><div class="mv">${fHM(totMs(tdS(cg.id)))}</div></div></div></div>
+${()=>{
+  if(!cl)return'';
+  const clientTasks=S.DB.tasks.filter(t=>t.clientId===cl.id);
+  if(!clientTasks.length)return'';
+  const today=new Date().toDateString();
+  const storageKey='cc_tasks_'+cg.id+'_'+today;
+  let done={};try{done=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
+  const doneCount=Object.values(done).filter(Boolean).length;
+  const total=clientTasks.length;
+  const pct=Math.round((doneCount/total)*100);
+  return`<div class="card" style="cursor:pointer" onclick="window.appCtab('tasks')">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+      <div style="font-size:13px;font-weight:600">Care tasks for ${cl.name}</div>
+      <div style="font-size:13px;font-weight:700;color:${pct===100?'var(--green)':'var(--tx)'}">${doneCount}/${total}</div>
+    </div>
+    <div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:${pct===100?'var(--green)':'var(--blue)'};border-radius:3px"></div>
+    </div>
+    <div style="font-size:11px;color:var(--t3);margin-top:4px">Tap to view task checklist</div>
+  </div>`;
+}()}
 ${S.cIn?`<div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
     <div class="sl" style="margin:0">Auto location log</div>
@@ -345,6 +465,79 @@ function bCGAssign(cg,as,cl){
   if(!as||!cl)return`<div class="card"><div class="empty">No active assignment.<br>Contact your supervisor.</div></div>`;
   return`<div class="card"><div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem"><div class="av avb" style="width:48px;height:48px;font-size:16px">${ini(cl.name)}</div><div><div style="font-size:18px;font-weight:700">${cl.name}</div><div class="bdg bg" style="margin-top:4px">Active assignment</div></div></div><div class="div"></div><div class="sl">Client information</div><div class="ir"><div class="ik">Street</div><div class="iv">${[cl.street,cl.apt].filter(Boolean).join(', ')||'Not set'}</div></div><div class="ir"><div class="ik">City/State/ZIP</div><div class="iv">${[cl.city,cl.state,cl.zip].filter(Boolean).join(', ')||'-'}</div></div><div class="ir"><div class="ik">Work days</div><div class="iv">${as.workDays||cl.schedule||'Not specified'}</div></div><div class="ir"><div class="ik">Shift hours</div><div class="iv">${as.shiftStart&&as.shiftEnd?as.shiftStart+' \u2013 '+as.shiftEnd:'Not set'}</div></div><div class="ir"><div class="ik">Clock-in radius</div><div class="iv">${cl.radiusFt||100} ft from care address</div></div><div class="ir"><div class="ik">Min hours/day</div><div class="iv">${as.minHours?as.minHours+'h minimum':'Not set'}</div></div><div class="ir"><div class="ik">Start date</div><div class="iv">${as.startDate||'Not set'}</div></div><div class="ir"><div class="ik">End date</div><div class="iv">${as.endDate||'Ongoing'}</div></div>${cl.notes?`<div class="ir"><div class="ik">Care notes</div><div class="iv">${cl.notes}</div></div>`:''}</div><div class="card"><div class="sl">Emergency contact</div>${cl.ecName?.trim()?`<div class="ir"><div class="ik">Name</div><div class="iv">${cl.ecName}</div></div><div class="ir"><div class="ik">Phone</div><div class="iv"><a href="tel:${cl.ecPhone}" style="color:var(--blue);font-weight:600">${cl.ecPhone}</a></div></div><div class="ir"><div class="ik">Relationship</div><div class="iv">${cl.ecRel||'Not specified'}</div></div>`:`<div class="empty">No emergency contact on file</div>`}</div>`;
 }
+function bCGTasks(cg,cl){
+  if(!cl)return`<div class="card"><div class="empty">No active assignment.<br>Contact your supervisor.</div></div>`;
+  const clientTasks=S.DB.tasks.filter(t=>t.clientId===cl.id).sort((a,b)=>(a.order||0)-(b.order||0));
+  if(!clientTasks.length)return`<div class="card"><div class="empty">No care tasks set up yet.<br>Your supervisor will add them soon.</div></div>`;
+
+  // Get today's completions from localStorage
+  const today=new Date().toDateString();
+  const storageKey='cc_tasks_'+cg.id+'_'+today;
+  let done={};
+  try{done=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
+
+  const doneCount=Object.values(done).filter(Boolean).length;
+  const total=clientTasks.length;
+  const pct=Math.round((doneCount/total)*100);
+
+  // Group by category
+  const cats={};
+  clientTasks.forEach(t=>{const cat=t.cat||'Other';(cats[cat]=cats[cat]||[]).push(t);});
+
+  const catColors={
+    'Personal care':'background:var(--bl);color:var(--bt)',
+    'Medication':'background:var(--rl);color:var(--rt)',
+    'Meals':'background:var(--gl);color:var(--gt)',
+    'Household':'background:var(--al);color:var(--at)',
+    'Mobility':'background:var(--purple-l,#EEEDFE);color:var(--purple-t,#3C3489)',
+    'Other':'background:var(--b1);color:var(--t2)'
+  };
+
+  const taskRows=Object.entries(cats).map(([cat,tasks])=>`
+    <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin:.75rem 0 .25rem">${cat}</div>
+    ${tasks.map(t=>{
+      const isDone=!!done[t.id];
+      return`<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--b1);cursor:pointer" onclick="window.appToggleTask('${t.id}','${storageKey}')">
+        <div style="width:22px;height:22px;border-radius:6px;border:2px solid ${isDone?'var(--green)':'var(--b2)'};background:${isDone?'var(--green)':'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s">
+          ${isDone?'<span style="color:#fff;font-size:13px;font-weight:700">&#x2713;</span>':''}
+        </div>
+        <div style="flex:1;${isDone?'opacity:.5':''}">
+          <div style="font-size:14px;font-weight:600;color:var(--tx);${isDone?'text-decoration:line-through':''}">${t.title}</div>
+          ${t.desc?`<div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.6">${t.desc}</div>`:''}
+          ${t.freq?`<div style="font-size:11px;margin-top:4px"><span style="padding:2px 8px;border-radius:20px;font-weight:600;${catColors[t.cat]||catColors['Other']}">${t.freq}</span></div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  `).join('');
+
+  return`<div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+      <div>
+        <div style="font-size:16px;font-weight:700">${cl.name} &mdash; Care Tasks</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:2px">${doneCount} of ${total} completed today</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:700;color:${pct===100?'var(--green)':'var(--tx)'}">${pct}%</div>
+      </div>
+    </div>
+    <div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden;margin-bottom:1rem">
+      <div style="height:100%;width:${pct}%;background:var(--green);border-radius:3px;transition:width .3s"></div>
+    </div>
+    ${taskRows}
+    ${doneCount===total&&total>0?`<div style="text-align:center;padding:1rem 0;font-size:14px;font-weight:600;color:var(--green)">&#x1F389; All tasks complete for today!</div>`:''}
+  </div>
+  <div style="text-align:center;font-size:12px;color:var(--t3);margin-bottom:1rem">Tap a task to mark it complete. Progress resets each day.</div>`;
+}
+
+window.appToggleTask=function(taskId,storageKey){
+  let done={};
+  try{done=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
+  done[taskId]=!done[taskId];
+  localStorage.setItem(storageKey,JSON.stringify(done));
+  // Re-render just the tasks tab
+  S.ctab='tasks';render();
+};
+
 function bCGHours(cg){
   const td=tdS(cg.id),wk=wkS(cg.id),al=alS(cg.id),gr={};
   wk.forEach(s=>{const d=fDs(tsMs(s.inTime));(gr[d]=gr[d]||[]).push(s);});
