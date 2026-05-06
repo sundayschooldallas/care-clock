@@ -419,6 +419,31 @@ function bCG(){
 }
 window.appCtab=function(t){S.ctab=t;render();};
 
+function buildTaskProgress(cg,cl){
+  if(!cl)return'';
+  const clientTasks=S.DB.tasks.filter(t=>t.clientId===cl.id);
+  if(!clientTasks.length)return'';
+  const today=new Date().toDateString();
+  const storageKey='cc_tasks_'+cg.id+'_'+today;
+  let done={};
+  try{done=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
+  const doneCount=Object.values(done).filter(Boolean).length;
+  const total=clientTasks.length;
+  const pct=Math.round((doneCount/total)*100);
+  const barColor=pct===100?'var(--green)':'var(--blue)';
+  const numColor=pct===100?'var(--green)':'var(--tx)';
+  return '<div class="card" style="cursor:pointer" onclick="window.appCtab('tasks')">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">'
+    +'<div style="font-size:13px;font-weight:600">Care tasks for '+cl.name+'</div>'
+    +'<div style="font-size:13px;font-weight:700;color:'+numColor+'">'+doneCount+'/'+total+'</div>'
+    +'</div>'
+    +'<div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">'
+    +'<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:3px"></div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Tap to view &amp; check off tasks</div>'
+    +'</div>';
+}
+
 function bCGClock(cg,cl){
   const el=S.cIn&&S.cTime?Date.now()-S.cTime:0;
   let geo='';
@@ -431,27 +456,7 @@ function bCGClock(cg,cl){
   const canC=!!(cl?.lat);
   const mb=S.cIn?`<button class="btn btnr" onclick="window.appClock()">Clock out</button>`:(canC&&S.lOk)?`<button class="btn btng" onclick="window.appClock()">Clock in</button>`:`<button class="btn" disabled>${!canC?'No assignment':'Must be within 100 ft'}</button>`;
   return`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">${badge}<div class="cel" id="cel" style="${S.cIn?'':'display:none'}">${fEl(el)}</div></div><div class="cbig" id="cface">${fT(Date.now())}</div><div class="cdate">${fD(Date.now())}</div><div class="div"></div>${geo}${canC?`<button class="btn btno" style="margin-bottom:.75rem" id="loc-btn" onclick="window.appCheckLoc()">&#x1F4CD; Verify my location</button>`:''} ${mb}${cl?`<div class="noti">Must be within ${cl.radiusFt||100} ft of ${[cl.street,cl.city,cl.state].filter(Boolean).join(', ')||cl.address||'care address'}</div>`:''}</div><div class="card"><div class="sl">Today</div><div class="mg"><div class="met"><div class="ml">Shifts</div><div class="mv">${tdS(cg.id).length}</div></div><div class="met"><div class="ml">Hours</div><div class="mv">${fHM(totMs(tdS(cg.id)))}</div></div></div></div>
-${()=>{
-  if(!cl)return'';
-  const clientTasks=S.DB.tasks.filter(t=>t.clientId===cl.id);
-  if(!clientTasks.length)return'';
-  const today=new Date().toDateString();
-  const storageKey='cc_tasks_'+cg.id+'_'+today;
-  let done={};try{done=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch(e){}
-  const doneCount=Object.values(done).filter(Boolean).length;
-  const total=clientTasks.length;
-  const pct=Math.round((doneCount/total)*100);
-  return`<div class="card" style="cursor:pointer" onclick="window.appCtab('tasks')">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-      <div style="font-size:13px;font-weight:600">Care tasks for ${cl.name}</div>
-      <div style="font-size:13px;font-weight:700;color:${pct===100?'var(--green)':'var(--tx)'}">${doneCount}/${total}</div>
-    </div>
-    <div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:${pct===100?'var(--green)':'var(--blue)'};border-radius:3px"></div>
-    </div>
-    <div style="font-size:11px;color:var(--t3);margin-top:4px">Tap to view task checklist</div>
-  </div>`;
-}()}
+${buildTaskProgress(cg,cl)}
 ${S.cIn?`<div class="card">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
     <div class="sl" style="margin:0">Auto location log</div>
