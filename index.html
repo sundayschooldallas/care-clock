@@ -101,7 +101,7 @@ const tdS=id=>{const t=new Date().toDateString();return S.DB.sess.filter(s=>s.cg
 const wkS=id=>{const n=new Date(),d=n.getDay(),st=new Date(n);st.setDate(n.getDate()-d);st.setHours(0,0,0,0);return S.DB.sess.filter(s=>s.cgId===id&&s.outTime&&new Date(tsMs(s.inTime))>=st);};
 const alS=id=>S.DB.sess.filter(s=>s.cgId===id&&s.outTime);
 const totMs=arr=>arr.reduce((s,x)=>s+(tsMs(x.outTime)-tsMs(x.inTime)),0);
-async function loadDB(){const[a,b,c,d]=await Promise.all([fsAll('caregivers'),fsAll('clients'),fsAll('assignments'),fsAll('sessions')]);S.DB={cgs:a,cls:b,ass:c,sess:d};await Promise.all(S.DB.cgs.map(async cg=>{const l=await fsGet('lockouts',lkk(cg.email||''));cg._locked=l?.locked===true;}));}
+async function loadDB(){const[a,b,cc,d,e]=await Promise.all([fsAll('caregivers'),fsAll('clients'),fsAll('assignments'),fsAll('sessions'),fsAll('tasks')]);S.DB={cgs:a,cls:b,ass:cc,sess:d,tasks:e};await Promise.all(S.DB.cgs.map(async cg=>{const l=await fsGet('lockouts',lkk(cg.email||''));cg._locked=l?.locked===true;}));}
 const isLocked=async em=>{const l=await fsGet('lockouts',lkk(em));return l?.locked===true;};
 const recFail=async em=>{const k=lkk(em),l=await fsGet('lockouts',k)||{attempts:0};const a=(l.attempts||0)+1,lk=a>=2;await fsSet('lockouts',k,{email:em,attempts:a,locked:lk,updatedAt:Date.now()});return{attempts:a,locked:lk};};
 const clrLock=async em=>fsDel('lockouts',lkk(em));
