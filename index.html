@@ -78,7 +78,7 @@ const fsAdd=async(c,d)=>{const r=await addDoc(collection(db,c),d);return r.id;};
 const fsDel=async(c,i)=>{try{await deleteDoc(doc(db,c,i));}catch(e){}};
 const fsAll=async(c)=>{try{const s=await getDocs(collection(db,c));return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}};
 const fsQ=async(c,f,op,v)=>{try{const q=query(collection(db,c),where(f,op,v));const s=await getDocs(q);return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return[];}};
-const S={view:'loading',stab:'dash',ctab:'clock',user:null,role:null,cgp:null,isSup:false,eCG:null,eCL:null,eAS:null,lOk:false,lChk:false,lDist:null,lErr:null,cIn:false,cTime:null,cSid:null,tick:null,DB:{cgs:[],cls:[],ass:[],sess:[]}};
+const S={view:'loading',stab:'dash',ctab:'clock',user:null,role:null,cgp:null,isSup:false,eCG:null,eCL:null,eAS:null,lOk:false,lChk:false,lDist:null,lErr:null,cIn:false,cTime:null,cSid:null,tick:null,autoTick:null,locLogs:[],DB:{cgs:[],cls:[],ass:[],sess:[]}};
 const $=id=>document.getElementById(id);
 const ini=n=>(n||'?').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -276,8 +276,36 @@ function bRep(){
   let h=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.875rem"><div class="sl" style="margin:0">All caregiver reports</div><button class="bsm" onclick="window.appExport()">Export CSV</button></div>`;
   if(!S.DB.cgs.length){h+=`<div class="empty">No caregivers yet</div>`;}
   else S.DB.cgs.forEach(cg=>{const as=getAS(cg.id),cl=as?getCL(as.clientId):null,td=totMs(tdS(cg.id)),wk=totMs(wkS(cg.id)),al=totMs(alS(cg.id)),rc=alS(cg.id).slice(-5).reverse();h+=`<div style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--b1)"><div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem"><div class="av avg">${ini(cg.name)}</div><div><div style="font-size:15px;font-weight:700">${cg.name}</div><div style="font-size:12px;color:var(--t2)">${cl?cl.name:'No assignment'}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:.5rem"><div class="met"><div class="ml">Today</div><div style="font-size:14px;font-weight:700">${fHM(td)}</div></div><div class="met"><div class="ml">This week</div><div style="font-size:14px;font-weight:700">${fHM(wk)}</div></div><div class="met"><div class="ml">All time</div><div style="font-size:14px;font-weight:700">${fHM(al)}</div></div></div>${rc.map(s=>`<div class="row"><span style="font-size:13px;color:var(--t2)">${fDs(tsMs(s.inTime))} ${fT2(tsMs(s.inTime))}&ndash;${fT2(tsMs(s.outTime))}</span><span style="font-size:13px;font-weight:600;color:var(--green)">${fHM(tsMs(s.outTime)-tsMs(s.inTime))}</span></div>`).join('')}</div>`;});
-  h+=`</div>`;return h;
+  h+=`</div>`;
+
+  // Location logs section
+  h+=`<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem"><div class="sl" style="margin:0">Auto location checks</div><button class="bsm" onclick="window.appExportLoc()">Export CSV</button></div><div id="sup-loc-log"><div class="empty" style="padding:.75rem">Loading...</div></div></div>`;
+
+  // Load async after render
+  setTimeout(async()=>{
+    const panel=document.getElementById('sup-loc-log');if(!panel)return;
+    const logs=await fsAll('locLogs');
+    if(!logs.length){panel.innerHTML='<div class="empty">No auto-checks recorded yet</div>';return;}
+    const sorted=logs.sort((a,b)=>b.ts-a.ts).slice(0,50);
+    panel.innerHTML=sorted.map(l=>{
+      const cg=getCG(l.cgId),as=getAS(l.cgId),cl=as?getCL(as.clientId):null;
+      const icon=l.inRange?'&#x2713;':'&#x26A0;',cls=l.inRange?'background:var(--gl);color:var(--gt)':'background:var(--rl);color:var(--rt)';
+      return`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1)"><div><div style="font-size:13px;font-weight:600">${cg?.name||'?'} &mdash; ${fT2(l.ts)} ${fDs(l.ts)}</div><div style="font-size:11px;color:var(--t3)">${l.dist} ft from address &bull; Lat: ${l.lat?.toFixed(4)||'?'}, Lng: ${l.lng?.toFixed(4)||'?'}</div><div style="font-size:11px;color:var(--t3)">${cl?.name||''}</div></div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:8px;${cls}">${icon} ${l.inRange?'In range':'OUT OF RANGE'}</span></div>`;
+    }).join('');
+  },100);
+
+  return h;
 }
+window.appExportLoc=async function(){
+  const logs=await fsAll('locLogs');
+  if(!logs.length){alert('No location logs yet.');return;}
+  const h=['Caregiver','Client','Date','Time','Distance (ft)','In Range','Lat','Lng'];
+  const r=logs.sort((a,b)=>b.ts-a.ts).map(l=>{
+    const cg=getCG(l.cgId),as=getAS(l.cgId),cl=as?getCL(as.clientId):null;
+    return[cg?.name||'',cl?.name||'',fDs(l.ts),fT2(l.ts),l.dist||'',l.inRange?'Yes':'No',l.lat?.toFixed(6)||'',l.lng?.toFixed(6)||''];
+  });
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n')],{type:'text/csv'}));a.download='location_logs.csv';a.click();
+};
 window.appExport=function(){const h=['Caregiver','Client','Date','In','Out','Hrs','Min'];const r=S.DB.sess.filter(s=>s.outTime).map(s=>{const cg=getCG(s.cgId),as=getAS(s.cgId),cl=as?getCL(as.clientId):null,ms=tsMs(s.outTime)-tsMs(s.inTime);return[cg?.name||'',cl?.name||'',fDs(tsMs(s.inTime)),fT2(tsMs(s.inTime)),fT2(tsMs(s.outTime)),(ms/3600000).toFixed(2),Math.round(ms/60000)];});const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n')],{type:'text/csv'}));a.download='care_clock.csv';a.click();};
 
 function bCG(){
@@ -297,13 +325,21 @@ function bCGClock(cg,cl){
   let geo='';
   if(!cl)geo=`<div class="geo gneu"><div class="dot da" style="margin-top:3px"></div><span>No active assignment. Contact your supervisor.</span></div>`;
   else if(!cl.lat)geo=`<div class="geo gneu"><div class="dot da" style="margin-top:3px"></div><span>Care location not set. Contact your supervisor.</span></div>`;
-  else if(!S.lChk)geo=`<div class="geo gneu"><div class="dot da" style="margin-top:3px"></div><span>Tap below to verify your location.</span></div>`;
-  else if(S.lOk)geo=`<div class="geo gok"><div class="dot dg" style="margin-top:3px"></div><span>&#x2713; Within range &mdash; ${Math.round(S.lDist)} ft from ${cl.name}'s address (limit: ${cl.radiusFt||100} ft)</span></div>`;
-  else geo=`<div class="geo gfail"><div class="dot dr" style="margin-top:3px"></div><span>${S.lDist!==null?`You are ${Math.round(S.lDist)} ft away. `:''}Must be within ${cl.radiusFt||100} ft of ${cl.name}'s address.</span></div>`;
+  else if(!S.lChk)geo=`<div class="geo gneu" id="geo-bar"><div class="dot da" style="margin-top:3px"></div><span>Tap below to verify your location.</span></div>`;
+  else if(S.lOk)geo=`<div class="geo gok" id="geo-bar"><div class="dot dg" style="margin-top:3px"></div><span>&#x2713; Within range &mdash; ${Math.round(S.lDist)} ft from ${cl.name}'s address (limit: ${cl.radiusFt||100} ft)</span></div>`;
+  else geo=`<div class="geo gfail" id="geo-bar"><div class="dot dr" style="margin-top:3px"></div><span>${S.lDist!==null?`You are ${Math.round(S.lDist)} ft away. `:''}Must be within ${cl.radiusFt||100} ft of ${cl.name}'s address.</span></div>`;
   const badge=S.cIn?`<div class="bdg bg"><div class="dot dg"></div>Clocked in</div>`:`<div class="bdg br"><div class="dot dr"></div>Clocked out</div>`;
   const canC=!!(cl?.lat);
   const mb=S.cIn?`<button class="btn btnr" onclick="window.appClock()">Clock out</button>`:(canC&&S.lOk)?`<button class="btn btng" onclick="window.appClock()">Clock in</button>`:`<button class="btn" disabled>${!canC?'No assignment':'Must be within 100 ft'}</button>`;
-  return`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">${badge}<div class="cel" id="cel" style="${S.cIn?'':'display:none'}">${fEl(el)}</div></div><div class="cbig" id="cface">${fT(Date.now())}</div><div class="cdate">${fD(Date.now())}</div><div class="div"></div>${geo}${canC?`<button class="btn btno" style="margin-bottom:.75rem" id="loc-btn" onclick="window.appCheckLoc()">&#x1F4CD; Verify my location</button>`:''} ${mb}${cl?`<div class="noti">Must be within ${cl.radiusFt||100} ft of ${[cl.street,cl.city,cl.state].filter(Boolean).join(', ')||cl.address||'care address'}</div>`:''}</div><div class="card"><div class="sl">Today</div><div class="mg"><div class="met"><div class="ml">Shifts</div><div class="mv">${tdS(cg.id).length}</div></div><div class="met"><div class="ml">Hours</div><div class="mv">${fHM(totMs(tdS(cg.id)))}</div></div></div></div>`;
+  return`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">${badge}<div class="cel" id="cel" style="${S.cIn?'':'display:none'}">${fEl(el)}</div></div><div class="cbig" id="cface">${fT(Date.now())}</div><div class="cdate">${fD(Date.now())}</div><div class="div"></div>${geo}${canC?`<button class="btn btno" style="margin-bottom:.75rem" id="loc-btn" onclick="window.appCheckLoc()">&#x1F4CD; Verify my location</button>`:''} ${mb}${cl?`<div class="noti">Must be within ${cl.radiusFt||100} ft of ${[cl.street,cl.city,cl.state].filter(Boolean).join(', ')||cl.address||'care address'}</div>`:''}</div><div class="card"><div class="sl">Today</div><div class="mg"><div class="met"><div class="ml">Shifts</div><div class="mv">${tdS(cg.id).length}</div></div><div class="met"><div class="ml">Hours</div><div class="mv">${fHM(totMs(tdS(cg.id)))}</div></div></div></div>
+${S.cIn?`<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <div class="sl" style="margin:0">Auto location log</div>
+    <span style="font-size:11px;color:var(--t3)">Checks every ~2 min</span>
+  </div>
+  <div id="auto-log-panel">${buildAutoLog()}</div>
+</div>`:''}
+`;
 }
 function bCGAssign(cg,as,cl){
   if(!as||!cl)return`<div class="card"><div class="empty">No active assignment.<br>Contact your supervisor.</div></div>`;
@@ -327,12 +363,110 @@ window.appCheckLoc=function(){
 };
 window.appClock=async function(){
   const cg=S.cgp;
-  if(S.cIn){await fsSet('sessions',S.cSid,{outTime:Date.now()});S.cIn=false;S.cTime=null;S.cSid=null;}
-  else{const sid=uid();await fsSet('sessions',sid,{cgId:cg.id,inTime:Date.now(),outTime:null,createdAt:Date.now()});S.cIn=true;S.cTime=Date.now();S.cSid=sid;}
+  if(S.cIn){
+    // Clock out - stop auto tracking
+    await fsSet('sessions',S.cSid,{outTime:Date.now()});
+    S.cIn=false;S.cTime=null;S.cSid=null;
+    stopAutoTrack();
+  } else {
+    // Clock in - start auto tracking after first verify
+    const sid=uid();
+    await fsSet('sessions',sid,{cgId:cg.id,inTime:Date.now(),outTime:null,createdAt:Date.now()});
+    S.cIn=true;S.cTime=Date.now();S.cSid=sid;
+    S.locLogs=[];
+    startAutoTrack();
+  }
   await loadDB();render();
 };
+
+function startAutoTrack(){
+  clearInterval(S.autoTick);
+  // Do first check immediately after clock-in, then every 2 minutes
+  setTimeout(()=>{doAutoLocCheck();},5000);
+  // Randomize interval between 100-140 seconds (avg 2 min)
+  function scheduleNext(){
+    const delay=(100+Math.floor(Math.random()*40))*1000;
+    S.autoTick=setTimeout(()=>{if(S.cIn){doAutoLocCheck();scheduleNext();}},delay);
+  }
+  scheduleNext();
+}
+
+function stopAutoTrack(){
+  clearTimeout(S.autoTick);
+  S.autoTick=null;
+}
+
+function doAutoLocCheck(){
+  const as=getAS(S.cgp?.id),cl=as?getCL(as.clientId):null;
+  if(!cl?.lat)return;
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const dist=dFt(pos.coords.latitude,pos.coords.longitude,cl.lat,cl.lng);
+    const maxFt=cl.radiusFt||100;
+    const inRange=dist<=maxFt;
+    const ts=Date.now();
+    const logEntry={
+      ts,
+      lat:pos.coords.latitude,
+      lng:pos.coords.longitude,
+      dist:Math.round(dist),
+      inRange,
+      maxFt
+    };
+    // Add to local log
+    S.locLogs.unshift(logEntry);
+    if(S.locLogs.length>20)S.locLogs.pop(); // keep last 20
+    // Save to Firestore under the session
+    if(S.cSid){
+      await fsSet('locLogs',S.cSid+'_'+ts,{
+        cgId:S.cgp.id,
+        sessionId:S.cSid,
+        ts,lat:pos.coords.latitude,lng:pos.coords.longitude,
+        dist:Math.round(dist),inRange,maxFt,
+        auto:true
+      });
+    }
+    // Update location display without full re-render
+    updateLocDisplay(logEntry,cl);
+  },err=>{
+    const ts=Date.now();
+    const logEntry={ts,dist:null,inRange:null,err:'Could not get location',auto:true};
+    S.locLogs.unshift(logEntry);
+    if(S.locLogs.length>20)S.locLogs.pop();
+    updateLocDisplay(logEntry,null);
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:30000});
+}
+
+function updateLocDisplay(entry,cl){
+  // Update the auto-log panel if visible
+  const panel=document.getElementById('auto-log-panel');
+  if(panel)panel.innerHTML=buildAutoLog();
+  // Update geo status bar
+  const geoBar=document.getElementById('geo-bar');
+  if(geoBar&&cl){
+    const maxFt=cl?.radiusFt||100;
+    if(entry.inRange){
+      geoBar.className='geo gok';
+      geoBar.innerHTML=`<div class="dot dg" style="margin-top:3px;flex-shrink:0"></div><span>&#x2713; Auto verified &mdash; ${entry.dist} ft from address (limit: ${maxFt} ft)</span>`;
+    } else if(entry.dist!==null){
+      geoBar.className='geo gfail';
+      geoBar.innerHTML=`<div class="dot dr" style="margin-top:3px;flex-shrink:0"></div><span>&#x26A0; Out of range &mdash; ${entry.dist} ft from address (limit: ${maxFt} ft)</span>`;
+    }
+  }
+}
+
+function buildAutoLog(){
+  if(!S.locLogs.length)return'<div style="font-size:12px;color:var(--t3);text-align:center;padding:.5rem">Auto-checks will appear here</div>';
+  return S.locLogs.map(e=>{
+    const time=fT2(e.ts);
+    if(e.err)return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)"><span style="font-size:12px;color:var(--t3)">${time} &mdash; ${e.err}</span><span style="font-size:11px;background:var(--al);color:var(--at);padding:2px 7px;border-radius:20px">Error</span></div>`;
+    const icon=e.inRange?'&#x2713;':'&#x26A0;';
+    const cls=e.inRange?'background:var(--gl);color:var(--gt)':'background:var(--rl);color:var(--rt)';
+    const label=e.inRange?'In range':'Out of range';
+    return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--b1)"><div><div style="font-size:12px;color:var(--tx);font-weight:500">${time} &mdash; Auto verify complete</div><div style="font-size:11px;color:var(--t3)">${e.dist} ft &bull; Coords: ${e.lat?.toFixed(4)||'?'}, ${e.lng?.toFixed(4)||'?'}</div></div><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;flex-shrink:0;margin-left:8px;${cls}">${icon} ${label}</span></div>`;
+  }).join('');
+}
 function sTick(){clearInterval(S.tick);S.tick=setInterval(()=>{const f=$('cface');if(f)f.textContent=fT(Date.now());const e=$('cel');if(e&&S.cIn&&S.cTime)e.textContent=fEl(Date.now()-S.cTime);},1000);}
-window.appLogout=async function(){clearInterval(S.tick);S.isSup=false;S.cIn=false;S.cTime=null;S.lOk=false;S.lChk=false;S.cgp=null;await signOut(auth);};
+window.appLogout=async function(){clearInterval(S.tick);stopAutoTrack();S.isSup=false;S.cIn=false;S.cTime=null;S.lOk=false;S.lChk=false;S.cgp=null;S.locLogs=[];await signOut(auth);};
 
 // ── AUTH LISTENER — DEFINED LAST so all window.appXxx functions exist ──────
 let _rdy=false;
