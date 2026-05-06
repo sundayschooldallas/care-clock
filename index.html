@@ -432,16 +432,16 @@ function buildTaskProgress(cg,cl){
   const pct=Math.round((doneCount/total)*100);
   const barColor=pct===100?'var(--green)':'var(--blue)';
   const numColor=pct===100?'var(--green)':'var(--tx)';
-  return '<div class="card" style="cursor:pointer" onclick="window.appCtab('tasks')">'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">'
-    +'<div style="font-size:13px;font-weight:600">Care tasks for '+cl.name+'</div>'
-    +'<div style="font-size:13px;font-weight:700;color:'+numColor+'">'+doneCount+'/'+total+'</div>'
-    +'</div>'
-    +'<div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">'
-    +'<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:3px"></div>'
-    +'</div>'
-    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Tap to view &amp; check off tasks</div>'
-    +'</div>';
+  return `<div class="card" style="cursor:pointer" onclick="window.appCtab('tasks')">`
+    +`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">`
+    +`<div style="font-size:13px;font-weight:600">Care tasks for ${cl.name}</div>`
+    +`<div style="font-size:13px;font-weight:700;color:${numColor}">${doneCount}/${total}</div>`
+    +`</div>`
+    +`<div style="height:6px;background:var(--b1);border-radius:3px;overflow:hidden">`
+    +`<div style="height:100%;width:${pct}%;background:${barColor};border-radius:3px"></div>`
+    +`</div>`
+    +`<div style="font-size:11px;color:var(--t3);margin-top:4px">Tap to view &amp; check off tasks</div>`
+    +`</div>`;
 }
 
 function bCGClock(cg,cl){
